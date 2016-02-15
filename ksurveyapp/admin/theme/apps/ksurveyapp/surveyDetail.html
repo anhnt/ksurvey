@@ -1,0 +1,345 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="/theme/apps/ksurveyapp/main.css">
+        <link rel="stylesheet" href="/theme/apps/ksurveyapp/morris.css">
+        <script src="/theme/apps/ksurveyapp/raphael-min.js">//</script>
+        <script src="/theme/apps/ksurveyapp/morris.min.js">//</script>
+        <script src="/static/d3/d3.v3.js">//</script>
+        <script src="/static/nvd3/nv.d3.js">//</script>
+        <script src="/theme/apps/ksurveyapp/main.js">//</script>
+    </head>
+    <body>
+
+        #set($survey = $page.attributes.survey)
+        <div class="tabbable">
+            <div class="clearfix">
+                <ul class="nav nav-tabs tab-bricky pull-left" role="tablist">
+                    <li role="presentation" class="active"><a href="#detail" aria-controls="detail" role="tab" data-toggle="tab"><i class="fa fa-edit"></i> Detail</a></li>
+                    <li role="presentation"><a href="#questions" aria-controls="questions" role="tab" data-toggle="tab"><i class="fa fa-list"></i> Questions</a></li>
+                    <li class="" role="presentation"><a href="#groups" aria-controls="groups" role="tab" data-toggle="tab"><i class="fa fa-users"></i> Group Access</a></li>
+                    <li role="presentation"><a href="#statistic" aria-controls="statistic" role="tab" data-toggle="tab"><i class="fa fa-area-chart"></i> Statistic</a></li>
+                    
+                    <li class="hide" role="presentation"><a href="#history" aria-controls="history" role="tab" data-toggle="tab"><i class="fa fa-clock-o"></i> History</a></li>
+                </ul>
+            </div>
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="detail">
+                    <form class="form-horizontal" action="" id="survey-form">
+                        <input type="hidden" name="user" value="$user.name" />
+                        <input type="hidden" name="surveyId" value="$survey.name" />
+                        <div class="form-group">
+                            <label class="control-label col-md-2" for="name">Name</label>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control required" name="name" required="required" value="$!survey.jsonObject.name" />
+                            </div>
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            <label class="control-label col-md-2" for="description">Description</label>
+                            <div class="col-md-4">
+                                <textarea class="form-control required" name="description" required="required" value="" >$!survey.jsonObject.description</textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-2" for="enable">Enabled</label>
+                            <div class="col-md-4">
+                                <div class="checkbox">
+                                    <label>
+                                        #if ($survey.jsonObject.status == 'true')
+                                            <input type="checkbox" name="status" id="enable" value="true" checked="" />
+                                        #else
+                                            <input type="checkbox" name="status" id="enable" value="true" />
+                                        #end
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-2" for="availableFromTo">Available from - to</label>
+                            <div class="col-md-4">
+                                <input type="text" required class="form-control required" id="availableFromTo" value="" placeholder="Choose a date range" />
+                                <input type="hidden" class="form-control" name="startTime" value="$!survey.jsonObject.startTime" />
+                                <input type="hidden" class="form-control" name="endTime" value="$!survey.jsonObject.endTime" />
+                            </div>
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-2">
+                                <button class="btn btn-primary" type="submit">Save changes</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div role="tabpanel" class="tab-pane" id="questions" >
+                    <div class="clearfix">
+                        <a href="#" class="btn btn-primary btn-sm pull-right btn-add-question" data-survey="$survey.name"><i class="fa fa-plus-square"></i> Add new question</a>
+                    </div>
+                    <hr>
+                    #set($questions = $page.attributes.questionResult.hits.hits)
+                    #set($answers = $page.attributes.answerResult.hits.hits)
+                    #if($page.attributes.questionResult.hits.totalHits > 0)
+                        #foreach($question in $questions)
+                            <div class="panel panel-default" data-questionId="$question.id">
+                                <div class="panel-heading"><h3 class="panel-title"><span>$question.fields.title.value</span> <a class="btn btn-link btn-xs btn-delete-question pull-right" href="#"><i class="fa fa-trash"></i></a><a class="btn btn-link btn-xs btn-edit-question pull-right" href="#"><i class="fa fa-edit"></i></a> </h3></div>
+                                <div class="panel-body">
+                                    <div class="question-body">$!question.fields.body.value</div>
+
+                                    <p><strong>Question type:</strong> <span class="question-type">$controllers.call('getQuestionType',$question.fields.type.value)</span></p>
+                                    #if($question.fields.type.value!='1')
+                                    <p class="clearfix"><strong>Answers List</strong> </p>
+                                    <!-- List group -->
+                                    <ul class="list-group">
+                                        #if($page.attributes.answerResult.hits.totalHits > 0)
+                                            #foreach($answer in $answers)
+                                                #if($answer.fields.questionId.value == $question.id)
+                                                <li class="list-group-item answer-item" data-answer="$answer.id">
+                                                <span>$answer.fields.body.value</span>
+                                                #if($question.fields.type.value!='2')
+                                                <a href="#" class="btn btn-link btn-sm pull-right btn-delete-answer"><i class="fa fa-trash"></i></a>
+                                                #end
+                                                <a href="#" class="btn btn-link btn-sm pull-right btn-edit-answer"><i class="fa fa-edit"></i></a></li>
+                                                #end
+                                            #end
+                                        #end
+                                    </ul>
+                                    #end
+                                    #if($question.fields.type.value=='3' || $question.fields.type.value=='0')
+                                    <form class="answer-form" autocomplete="off">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <input type="hidden" name="userId" value="$user.name" />
+                                                <input type="hidden" name="questionId" value="$question.id" />
+                                                <input type="hidden" name="surveyId" value="$survey.name" />
+                                                <input type="text" class="form-control required answer-input" placeholder="Type new answer and press enter" name="answerBody" required="required" value="" />
+                                            </div>
+                                        </div>
+                                    </form>
+                                    #end
+                                </div>
+
+                            </div>
+                         #end
+                    #else
+                        <p>No question found</p>
+                    #end
+                    <hr>
+                    <div class="clearfix">
+                        <a href="#" class="btn btn-primary btn-sm pull-right btn-add-question" data-survey="$survey.name"><i class="fa fa-plus-square"></i> Add new question</a>
+                    </div>
+                </div>
+                
+
+                <div role="tabpanel" class="tab-pane group-access" id="groups">
+                    <p>
+                        <a href="#modal-groups" data-toggle="modal" class="btn btn-default btn-sm"><i class="fa fa-plus"></i> Add/remove groups</a>                        
+                    </p>
+                    <hr />
+                    <div id="group-list" class="clearfix">
+                        #set ($groups = $page.find('/groups'))
+                        #set ($currentGroups = $survey.jsonObject.groups.split(','))
+                        #foreach($groupName in $currentGroups)
+                            #set ($g = $groups.child($groupName))
+                            <div class="alert alert-info">
+                                <span class="fa fa-users"></span>
+                                <a href="/groups/$g.name/members">$g.name</a>
+                                #if( $g.groupType == "P" )
+                                    - Primary group
+                                #elseif( $g.groupType == "M" )
+                                    - Mailing list
+                                #elseif( $g.groupType == "S" )
+                                    - Subscription
+                                #end
+                                -
+                                #if( $g.registrationMode == "o" )
+                                    Open group
+                                #elseif( $g.registrationMode == "c" )
+                                    Closed group
+                                #elseif( $g.registrationMode == "a" )
+                                    Administrator approval group
+                                #else
+                                    No registration mode has been set
+                                #end
+                            </div>
+                        #end
+                    </div>
+                </div>
+                
+                <div role="tabpanel" class="tab-pane" id="statistic" >
+                    #set ($surveyStatistic = $controllers.call('getSurveyStatistic', $page, $survey.name))
+                    #set ($surveyResult = $surveyStatistic.get('surveyResult'))
+                    #set ($userAgentResult = $surveyStatistic.get('userAgentResult'))
+                    #set ($totalSubmits = $surveyStatistic.get('totalSubmits'))
+                    #set ($histogram = $surveyStatistic.get('histogram'))
+                    #set($questions = $page.attributes.questionResult.hits.hits)
+                    #set($answers = $page.attributes.answerResult.hits.hits)
+
+                    <div class="survey-summary clearfix">
+                        <div class="row">
+                            <div class="col-sm-9">
+                                #if($histogram.entrySet().size()>0)
+                                <svg id="histogram" width="100%" height="300"></svg>
+                                <script type="text/javascript">
+                                    var histogramData = [
+                                        #foreach ($b in $histogram.entrySet())
+                                        {label: '$b.key', value: $b.value},
+                                        #end
+                                    ];
+                                </script>
+                                #end
+                            </div>
+
+                            <div class="col-sm-3">
+                                #if($surveyResult.entrySet().size()>0)
+                                <h3 style="padding-top: 60px">Total Submissions: $totalSubmits</h3>
+                                #else
+                                <p>No submits found</p>
+                                #end
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                #if($userAgentResult.get('browser').entrySet().size()>0 && $page.attributes.questionResult.hits.totalHits>0)
+                                    <div id="browserStats" style="height: 200px"></div>
+                                    <script type="text/javascript">
+                                        var browserStats = [
+                                            #foreach ($b in $userAgentResult.get('browser').entrySet())
+                                            {label: '$b.key', value: $b.value},
+                                            #end
+                                        ];
+                                    </script>
+                                #end
+                            </div>
+                            <div class="col-sm-4">
+                                #if($userAgentResult.get('os').entrySet().size()>0 && $page.attributes.questionResult.hits.totalHits>0)
+                                    <div id="osStats" style="height: 200px"></div>
+                                    <script type="text/javascript">
+                                        var osStats = [
+                                            #foreach ($b in $userAgentResult.get('os').entrySet())
+                                            {label: '$b.key', value: $b.value},
+                                            #end
+                                        ];
+                                    </script>
+                                #end
+                            </div>
+                        </div>
+                    </div>
+
+                    #if($page.attributes.questionResult.hits.totalHits > 0 && $surveyResult.entrySet().size()>0 )
+                         #foreach($question in $questions)
+                            <div class="panel panel-default" data-questionId="$question.id">
+                                <div class="panel-heading"><h3 class="panel-title"><span>$question.fields.title.value</span> </h3></div>
+                                <div class="panel-body">
+                                    <div class="question-body">$!question.fields.body.value</div>
+
+                                    <p><strong>Question type:</strong> <span class="question-type">$controllers.call('getQuestionType',$question.fields.type.value)</span></p>
+                                    #if($question.fields.type.value!='1')
+                                    <p class="clearfix"><strong>Answers Result</strong> </p>
+                                    <!-- List group -->
+                                    <div class="list-group">
+                                        #if($page.attributes.answerResult.hits.totalHits > 0)
+                                            #set($totalQuestionSubmits = $surveyResult.get($question.id).get('docCount'))
+                                            #foreach($answer in $answers)
+                                                #if($answer.fields.questionId.value == $question.id)
+                                                #set($totalAnswerSubmits = 0)
+                                                #if($surveyResult.get($question.id).get('answers').get($answer.id))
+                                                    #set($totalAnswerSubmits = $surveyResult.get($question.id).get('answers').get($answer.id))
+                                                #end
+                                                #set( $progress = $formatter.toPercent($totalAnswerSubmits, $totalQuestionSubmits) )
+
+                                                <div class="progress">
+                                                  <div class="progress-bar progress-bar-info progress-bar-striped active" role="progressbar" aria-valuenow="$progress.replace('%','')" aria-valuemin="0" aria-valuemax="100" style="text-align: left;">
+                                                        <div style="padding-left: 10px">$answer.fields.body.value ($progress - $totalAnswerSubmits selected)</div>
+                                                  </div>
+                                                </div>
+                                                #end
+                                            #end
+                                        #end
+                                    </div>
+                                    #else
+                                        #set($totalAnswerSubmits = $surveyResult.get($question.id).get('answers').get('PLAIN_TEXT_ANSWER'))
+                                        <p><strong>Total answers: $totalAnswerSubmits </strong> <a data-questionId="$question.id" data-surveyId="$survey.name" href="#" class="btn btn-default btn-xs btn-view-plain-answer hide">View all <i class="fa fa-arrow-down"></i></a></p>
+                                        <ul class="plain-answers">
+                                            #set ($plainAnswers = $controllers.call('getPlainAnswers', $page, $question.id, $survey.name))
+                                            #if($plainAnswers.hits.totalHits > 0)
+                                                #foreach($plainAnswer in $plainAnswers.hits.hits)
+                                                <li>$plainAnswer.fields.answerBody.value - <a href="#">$plainAnswer.fields.userId.value</a></li>
+                                                #end
+                                            #end
+                                        </ul>
+                                    #end
+                                </div>
+                            </div>
+                         #end
+                    #end
+                </div>
+
+                <div role="tabpanel" class="tab-pane hide" id="history">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut iure, repellat impedit eos sint at libero aliquid tempora velit recusandae! Debitis iure soluta suscipit a magnam modi fuga! Consectetur, non.
+                </div>
+            </div>
+        </div>
+        
+        <div id="modal-question" class="modal fade modal-md modal-fuse-editor">
+	        <div class="modal-header">
+	            <a href="#" data-dismiss="modal" class="close">&times;</a>
+	            <h4 class="modal-title">Add/Edit question</h4>
+	        </div>
+	        <div class="modal-body">
+                <div class="alert alert-danger alert-dismissible hide" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>
+	            <form class="form-horizontal">
+                    <input type="hidden" name="createdBy" value="anhnt" />
+                    <input type="hidden" name="questionId" value="" />
+				    <input type="hidden" name="surveyId" value="$survey.name" />
+				    <div class="form-group">
+				        <label class="control-label col-md-2" for="title">Title</label>
+				        <div class="col-md-10">
+				            <input type="text" class="form-control required" name="questionTitle" required="required" value="" />
+				        </div>
+				    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="questionType">Question type</label>
+                        <div class="col-md-10">
+                            <select name="questionType" class="form-control required" id="">
+                                <option value="0">Multichoices</option>
+                                <option value="1">Plain text</option>
+                                <option value="2">Yes/No Question</option>
+                                <option value="3">Selectbox</option>
+                            </select>
+                        </div>
+                    </div>
+				    <div class="form-group">
+				        <label class="control-label col-md-2">Body</label>
+				        <div class="col-md-10">
+				            <textarea rows="3" class="form-control htmleditor required" id="question-body" name="questionBody" required="required"></textarea>
+				        </div>
+				    </div>
+                    <button type="submit" style="visibility: hidden; height: 1px"></button>
+				</form>
+	        </div>
+	        <div class="modal-footer">
+	            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+	            <button type="button" class="btn btn-primary btn-popup-save">Save</button>
+	        </div>
+	    </div>
+
+        <div id="modal-groups" class="modal fade">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Choose groups</h4>
+            </div>
+            <div class="modal-body" data-surveyId="$survey.name">
+                #foreach($g in $page.find('/groups').children)
+                    <div class="checkbox">
+                        <label>
+                            #set ($isChecked = $survey.jsonObject.groups && $survey.jsonObject.groups.indexOf($g.name) != -1)
+                            $formatter.checkbox($g.name, $isChecked) $g.name
+                        </label>
+                    </div>
+                #end
+            </div>
+        </div>
+
+        
+    </body>
+</html>

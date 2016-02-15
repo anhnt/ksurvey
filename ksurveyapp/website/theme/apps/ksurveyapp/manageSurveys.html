@@ -1,0 +1,72 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+    #parse("/theme/masterTemplate.html")
+    <head>
+        #@themeHeader( "Surveys" )
+        <script src="/static/moment/2.4.0/moment-2.4.0.js" >//</script>
+        <style type="text/css">
+            .survey-item{
+                margin-bottom: 30px;
+            }
+        </style>
+        #end
+    </head>
+    <body class="">
+        #@themeBody()
+        #end
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-12">
+                    <h3>Surveys</h3>
+                    <hr>
+
+                    #set ($surveys = $page.attributes.surveys)
+                    #if ($surveys.size() > 0)
+                        #foreach ($survey in $surveys)
+                            #set($status = $survey.jsonObject.status)
+                            
+                            <div class="survey-item">
+                                #set($expired = $formatter.now.compareTo($formatter.toDate($survey.jsonObject.endTime)))
+                                #set($openingSoon = $formatter.now.compareTo($formatter.toDate($survey.jsonObject.startTime)))
+                                #set ($taken = $controllers.call('getSurveyResultByUser', $page, $user.name, $survey.name))
+                                <h4>$survey.jsonObject.name 
+                                    #if($expired>0) <span class="label label-danger">Expired</span> #end
+                                    #if($openingSoon<0) <span class="label label-info">Opening Soon</span> #end
+                                    #if($openingSoon>0 && $expired<0) <span class="label label-primary">Opening</span> #end
+                                    #if($taken.hits.totalHits>0) <span class="label label-success">Done</span> #end
+                                    #if(!$survey.jsonObject.status) <span class="label label-danger">Disabled</span> #end
+                                </h4>
+                                #if($survey.jsonObject.startTime)
+                                <div><i class="glyphicon glyphicon-time"></i> <span class="surveytime">$survey.jsonObject.startTime</span> - <span class="surveytime">$survey.jsonObject.endTime</span></div>
+                                #end
+                                <p>$survey.jsonObject.description</p>
+                                <p class="text-right">
+                                    
+                                    #if($taken.hits.totalHits>0)
+                                    <a href="#" title="You've done this survey" class="btn btn-primary" disabled >Start</a>
+                                    #else
+                                        #if(!$survey.jsonObject.status)
+                                            <a href="#" title="This survey is disabled at the moment" class="btn btn-danger" disabled>Start</a>
+                                        #else
+                                            #if($expired>=0 || $openingSoon<0) <a disabled href="/ksurvey/$survey.name" class="btn btn-primary">Start</a> #else
+                                            <a href="/ksurvey/$survey.name" class="btn btn-primary">Start</a>
+                                            #end
+                                        #end
+                                    #end
+                                </p>
+                            </div>
+                           <hr>
+                        #end
+                    #end
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            $(function(){
+                $('.surveytime').each(function(){
+                    var txt = $(this).text();
+                     $(this).text(moment(txt).format('DD/MM/YYYY hh:mm:ss'));
+                })
+            })
+        </script>
+    </body>
+</html>

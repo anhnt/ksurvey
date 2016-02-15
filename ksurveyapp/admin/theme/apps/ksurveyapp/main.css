@@ -1,0 +1,34 @@
+.question-type{
+    padding: 10px 0 !important;
+}
+
+#questions .panel-heading, #statistic .panel-heading {
+	padding-left: 15px;
+	
+}
+.answer-item{
+    position: relative;
+    padding-right: 50px;
+}
+.btn-delete-answer, .btn-edit-answer{
+    padding: 0 10px;
+    position: absolute;
+    right: 30px;
+    top: 10px;
+}
+.btn-delete-answer{
+    right: 10px;
+}
+
+.list-group .progress-bar{
+	transition: width ease-in-out 1s;
+	-webkit-transition: width ease-in-out 1s;
+	-moz-transition: width ease-in-out 1s;
+}
+
+.survey-summary{
+	padding: 15px;
+	background: #F5F5F5;
+	margin-bottom: 15px;
+	color: #333;
+}

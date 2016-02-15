@@ -1,0 +1,20 @@
+<controllers onAppEnabled="initApp">
+    <source>/APP-INF/app.js</source>
+    <source>/APP-INF/mapping.js</source>
+    <source>/APP-INF/ua-parser.min.js</source>
+    <source>/APP-INF/utils.js</source>
+    <source>/APP-INF/dbUtils.js</source>
+    <source>/APP-INF/fileManager.js</source>
+    <source>/APP-INF/adminSurveyManager.js</source>
+    <source>/APP-INF/websiteSurveyApp.js</source>
+    <menu parentId="menuRoot" id="menuManageSurvey" text="KSurvey" css="fa fa-question-circle" path="/ksurvey" ordering="80"/>
+    <menu type="website" parentId="menuRoot" id="menuSurveyApp" text="Survey" path="/ksurvey" ordering="80"/>
+    <role class="role">
+        <name>View &amp; Submit Survey</name>
+        <privNames>
+            <string>READ_CONTENT</string>
+        </privNames>
+    </role>
+</controllers>
+            
+            

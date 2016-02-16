@@ -19,6 +19,7 @@ $(function(){
     $('.btn-add-survey').on('click', function(e){
         e.preventDefault();
         modalSurvey.find('form').trigger('reset');
+        modalSurvey.find('form input[type=hidden].available-datetime').val('');
         openFuseModal(modalSurvey);
     });
 
@@ -223,6 +224,7 @@ $(function(){
 	    var form = $(this).parents('.list-group').siblings('.answer-form').clone();
 	    form.find('[name=answerBody]').val(span.text());
 	    form.append('<input type="hidden" name="answerId" value="'+answerId+'" />');
+        form.removeClass('hide');
 	    form.insertBefore(span);
 	});
 	
@@ -405,7 +407,8 @@ $(function(){
         $('.timeago').timeago();
         $('.surveytime').each(function(){
             var txt = $(this).text();
-             $(this).text(moment(txt).format('DD/MM/YYYY hh:mm:ss'));
+
+            txt && $(this).text(moment(txt).format('DD/MM/YYYY hh:mm:ss'));
         })
     }
 

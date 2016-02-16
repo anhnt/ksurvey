@@ -23,18 +23,26 @@
                     #if ($surveys.size() > 0)
                         #foreach ($survey in $surveys)
                             #set($status = $survey.jsonObject.status)
-                            
+                            #if($status)
                             <div class="survey-item">
+                                #if($survey.jsonObject.endTime && $survey.jsonObject.startTime)
                                 #set($expired = $formatter.now.compareTo($formatter.toDate($survey.jsonObject.endTime)))
                                 #set($openingSoon = $formatter.now.compareTo($formatter.toDate($survey.jsonObject.startTime)))
                                 #set ($taken = $controllers.call('getSurveyResultByUser', $page, $user.name, $survey.name))
                                 <h4>$survey.jsonObject.name 
                                     #if($expired>0) <span class="label label-danger">Expired</span> #end
                                     #if($openingSoon<0) <span class="label label-info">Opening Soon</span> #end
-                                    #if($openingSoon>0 && $expired<0) <span class="label label-primary">Opening</span> #end
+                                    #if($openingSoon>0 && $expired<0) <span class="label label-primary">Open</span> #end
                                     #if($taken.hits.totalHits>0) <span class="label label-success">Done</span> #end
-                                    #if(!$survey.jsonObject.status) <span class="label label-danger">Disabled</span> #end
+                                    ##if(!$survey.jsonObject.status) <span class="label label-danger">Disabled</span> #end
                                 </h4>
+                                #else
+                                <h4>$survey.jsonObject.name
+                                    <span class="label label-primary">Open</span> 
+                                    #if($taken.hits.totalHits>0) <span class="label label-success">Done</span> #end
+                                    ##if(!$survey.jsonObject.status) <span class="label label-danger">Disabled</span> #end
+                                </h4>
+                                #end
                                 #if($survey.jsonObject.startTime)
                                 <div><i class="glyphicon glyphicon-time"></i> <span class="surveytime">$survey.jsonObject.startTime</span> - <span class="surveytime">$survey.jsonObject.endTime</span></div>
                                 #end
@@ -54,7 +62,8 @@
                                     #end
                                 </p>
                             </div>
-                           <hr>
+                            <hr>
+                            #end
                         #end
                     #end
                 </div>

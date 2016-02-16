@@ -31,9 +31,10 @@
             #end
 
             #set ($taken = $controllers.call('getSurveyResultByUser', $page, $user.name, $survey.name))
-            #set($expired = $formatter.now.compareTo($formatter.toDate($survey.jsonObject.endTime)))
-            #set($openingSoon = $formatter.now.compareTo($formatter.toDate($survey.jsonObject.startTime)))
-
+            #if($survey.jsonObject.endTime && $survey.jsonObject.startTime)
+                #set($expired = $formatter.now.compareTo($formatter.toDate($survey.jsonObject.endTime)))
+                #set($openingSoon = $formatter.now.compareTo($formatter.toDate($survey.jsonObject.startTime)))
+            #end
             #if(!$canAccessSurvey)
             <div class="row">
                 <div class="col-sm-12">
@@ -58,7 +59,7 @@
                     </div>
                 </div>
             </div>
-            #elseif($expired>0)
+            #elseif($expired && $expired>0)
             <div class="row">
                 <div class="col-sm-12">
                     <div class="alert alert-danger">
@@ -66,7 +67,7 @@
                     </div>
                 </div>
             </div>
-            #elseif($openingSoon<0)
+            #elseif($openingSoon && $openingSoon<0)
             <div class="row">
                 <div class="col-sm-12">
                     <div class="alert alert-info">

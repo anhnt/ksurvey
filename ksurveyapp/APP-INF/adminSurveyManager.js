@@ -97,9 +97,12 @@ function saveSurvey (page, params) {
                 survey.description = description;
                 survey.status = status;
                 survey.modifiedDate = new Date();
+                survey.createdBy = user;
                 survey.modifiedBy = user;
-                survey.startTime = startTime;
-                survey.endTime = endTime;
+                if(startTime && endTime){
+                    survey.startTime = startTime;
+                    survey.endTime = endTime;
+                }
                 returnObj = survey;
                 returnObj.surveyId = surveyId;
                 surveyRes.update(JSON.stringify(survey), RECORD_TYPES.SURVEY);
@@ -117,10 +120,12 @@ function saveSurvey (page, params) {
                 modifiedDate: new Date(),
                 createdDate: new Date(),
                 createdBy: user,
-                modifiedBy: user,
-                startTime: startTime,
-                endTime: endTime
+                modifiedBy: user
             };
+            if(startTime && endTime){
+                surveyJson.startTime = startTime;
+                surveyJson.endTime = endTime;
+            }
             returnObj = surveyJson;
             returnObj.surveyId = newId;
             db.createNew(newId, JSON.stringify(surveyJson), RECORD_TYPES.SURVEY);

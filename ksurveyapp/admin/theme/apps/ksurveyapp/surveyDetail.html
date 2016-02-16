@@ -37,7 +37,7 @@
                         <div class="form-group">
                             <label class="control-label col-md-2" for="description">Description</label>
                             <div class="col-md-4">
-                                <textarea class="form-control required" name="description" required="required" value="" >$!survey.jsonObject.description</textarea>
+                                <textarea rows="8" class="form-control required" name="description" required="required" value="" >$!survey.jsonObject.description</textarea>
                             </div>
                         </div>
                         <div class="form-group">
@@ -57,7 +57,7 @@
                         <div class="form-group">
                             <label class="control-label col-md-2" for="availableFromTo">Available from - to</label>
                             <div class="col-md-4">
-                                <input type="text" required class="form-control required" id="availableFromTo" value="" placeholder="Choose a date range" />
+                                <input type="text" class="form-control" id="availableFromTo" value="" placeholder="Choose a date range" />
                                 <input type="hidden" class="form-control" name="startTime" value="$!survey.jsonObject.startTime" />
                                 <input type="hidden" class="form-control" name="endTime" value="$!survey.jsonObject.endTime" />
                             </div>
@@ -104,8 +104,8 @@
                                         #end
                                     </ul>
                                     #end
-                                    #if($question.fields.type.value=='3' || $question.fields.type.value=='0')
-                                    <form class="answer-form" autocomplete="off">
+                                    #if($question.fields.type.value!='1')
+                                    <form class="answer-form #if($question.fields.type.value=='2') hide #end" autocomplete="off">
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <input type="hidden" name="userId" value="$user.name" />
@@ -176,6 +176,7 @@
 
                     <div class="survey-summary clearfix">
                         <div class="row">
+                            #if($surveyResult.entrySet().size()>0)
                             <div class="col-sm-9">
                                 #if($histogram.entrySet().size()>0)
                                 <svg id="histogram" width="100%" height="300"></svg>
@@ -190,12 +191,11 @@
                             </div>
 
                             <div class="col-sm-3">
-                                #if($surveyResult.entrySet().size()>0)
                                 <h3 style="padding-top: 60px">Total Submissions: $totalSubmits</h3>
-                                #else
-                                <p>No submits found</p>
-                                #end
                             </div>
+                            #else
+                            <div class="col-sm-12"><p class="text-center">No submits found</p></div>
+                            #end
                         </div>
                         <div class="row">
                             <div class="col-sm-4">

@@ -166,6 +166,8 @@
                 </div>
                 
                 <div role="tabpanel" class="tab-pane" id="statistic" >
+                    #set($linebreaker ="\n")
+                    #set ($surveyCSV = "surveyid,totalSubmit,questionid,question_title,answerid,answer_body,votes,percent$linebreaker")
                     #set ($surveyStatistic = $controllers.call('getSurveyStatistic', $page, $survey.name))
                     #set ($surveyResult = $surveyStatistic.get('surveyResult'))
                     #set ($userAgentResult = $surveyStatistic.get('userAgentResult'))
@@ -192,6 +194,7 @@
 
                             <div class="col-sm-3">
                                 <h3 style="padding-top: 60px">Total Submissions: $totalSubmits</h3>
+                                <a id="csvDownload" download="data.csv" class="btn btn-primary">Download CSV</a>
                             </div>
                             #else
                             <div class="col-sm-12"><p class="text-center">No submits found</p></div>
@@ -222,6 +225,9 @@
                                     </script>
                                 #end
                             </div>
+                            <div class="col-sm-4">
+
+                            </div>
                         </div>
                     </div>
 
@@ -245,8 +251,8 @@
                                                 #if($surveyResult.get($question.id).get('answers').get($answer.id))
                                                     #set($totalAnswerSubmits = $surveyResult.get($question.id).get('answers').get($answer.id))
                                                 #end
-                                                #set( $progress = $formatter.toPercent($totalAnswerSubmits, $totalQuestionSubmits) )
-
+                                                #set($progress = $formatter.toPercent($totalAnswerSubmits, $totalQuestionSubmits) )
+                                                #set($surveyCSV = "$surveyCSV$survey.name,$totalSubmits,$question.id,$question.fields.title.value,$answer.id,$answer.fields.body.value,$totalAnswerSubmits,$progress$linebreaker")
                                                 <div class="progress">
                                                   <div class="progress-bar progress-bar-info progress-bar-striped active" role="progressbar" aria-valuenow="$progress.replace('%','')" aria-valuemin="0" aria-valuemax="100" style="text-align: left;">
                                                         <div style="padding-left: 10px">$answer.fields.body.value ($progress - $totalAnswerSubmits selected)</div>
@@ -272,6 +278,15 @@
                             </div>
                          #end
                     #end
+
+                    <script>
+                        var surveyCSV = "data:text/csv;charset=utf-8,$surveyCSV";
+                        var encodedUri = encodeURI(surveyCSV);
+                        var link = document.getElementById("csvDownload");
+                        link.setAttribute("href", encodedUri);
+                        link.setAttribute("download", "my_data.csv");
+                    </script>
+
                 </div>
 
                 <div role="tabpanel" class="tab-pane hide" id="history">

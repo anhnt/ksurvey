@@ -25,10 +25,10 @@
                             #set($status = $survey.jsonObject.status)
                             #if($status)
                             <div class="survey-item">
+                                #set ($taken = $controllers.call('getSurveyResultByUser', $page, $user.name, $survey.name))
                                 #if($survey.jsonObject.endTime && $survey.jsonObject.startTime)
                                 #set($expired = $formatter.now.compareTo($formatter.toDate($survey.jsonObject.endTime)))
                                 #set($openingSoon = $formatter.now.compareTo($formatter.toDate($survey.jsonObject.startTime)))
-                                #set ($taken = $controllers.call('getSurveyResultByUser', $page, $user.name, $survey.name))
                                 <h4>$survey.jsonObject.name 
                                     #if($expired>0) <span class="label label-danger">Expired</span> #end
                                     #if($openingSoon<0) <span class="label label-info">Opening Soon</span> #end

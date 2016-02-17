@@ -361,8 +361,6 @@ function deleteSurvey(page, params){
     }
 }
 
-
-
 function findQuestionBySurvey(page, surveyId){
     log.info('findQuestionBySurvey > page={}, surveyId={}', page, surveyId);
 
@@ -436,3 +434,4 @@ function generateTitle(page){
     var title = 'Manage Survey | ' + page.attributes.surveyId.jsonObject.name;
     return title;
 }
+

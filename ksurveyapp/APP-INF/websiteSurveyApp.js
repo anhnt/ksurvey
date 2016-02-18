@@ -330,3 +330,7 @@ function getPlainAnswers(page, questionId, surveyId){
     var searchResult = doDBSearch(page, queryJson);
     return searchResult;
 }
+
+function viewSurveyResult(page, params){
+    log.info('viewSurveyResult {}',params);
+}

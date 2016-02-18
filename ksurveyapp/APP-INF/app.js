@@ -1,6 +1,11 @@
 // admin controllers
 
 controllerMappings
+    .dependencies()
+    .add('KongoDB')
+    .build();
+
+controllerMappings
     .adminController()
     .path('/ksurvey')
     .enabled(true)
@@ -8,6 +13,7 @@ controllerMappings
     .addMethod('GET', 'getSurveys')
     .addMethod('POST', 'saveSurvey', 'saveSurvey')
     .addMethod('POST', 'deleteSurvey', 'deleteSurvey')
+    .addMethod('POST', 'clearSurveyResult', 'clearSurveyResult')
     .build();
 
 controllerMappings
@@ -69,7 +75,16 @@ controllerMappings
     .title('generateWebsiteTitle')
     .build();
 
-
+controllerMappings
+    .websiteController()
+    .path('/ksurvey/(?<surveyId>[^/]*)/result')
+    .enabled(true)
+    .isPublic(true)
+    .addPathResolver('surveyId', 'findSurvey')
+    .defaultView(views.templateView('ksurveyapp/surveyResult.html'))
+    .addMethod('GET', 'getSurvey')
+    .title('generateWebsiteTitle')
+    .build();
 
 function initApp(orgRoot, webRoot, enabled){
     log.info("initApp: orgRoot={}", orgRoot);

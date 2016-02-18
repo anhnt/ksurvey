@@ -295,6 +295,12 @@ $(function(){
                                 initTimeago();
                             }
                         });
+                    }else{
+                        $('#preview-area').reloadFragment({
+                            whenComplete: function(){
+                                initDateRange();
+                            }
+                        });
                     }
                 }else{
                     Msg.error(resp.data.messages.join('<br />'));

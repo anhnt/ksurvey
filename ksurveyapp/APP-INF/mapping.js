@@ -37,6 +37,9 @@ var surveyMapping = {
         },
         "groups": {
             "type": "string"
+        },
+        "websites": {
+            "type": "string"
         }
     }
 };

@@ -11,7 +11,7 @@
     <body>
 
         #set($survey = $page.attributes.survey)
-        <div class="tabbable">
+        <div class="tabbable" id="surveyManager">
             <div class="clearfix">
                 <ul class="nav nav-tabs tab-bricky pull-left" role="tablist">
                     <li role="presentation" class="active"><a href="#detail" aria-controls="detail" role="tab" data-toggle="tab"><i class="fa fa-edit"></i> Detail</a></li>
@@ -21,8 +21,22 @@
                     
                     <li class="hide" role="presentation"><a href="#history" aria-controls="history" role="tab" data-toggle="tab"><i class="fa fa-clock-o"></i> History</a></li>
                 </ul>
+                <div id="preview-area" class="btn-group pull-right">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Preview <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        #set ($wm = $page.find('/websites'))
+                        #foreach($w in $wm.websites)
+                            #if ($survey.jsonObject.websites.contains($w.name))
+                            #set ($url = "http://${wm.websiteAddress($w)}${formatter.portString}/ksurvey/$survey.name")
+                            <li><a target="_blank" href="$url">$w.name</a></li>
+                            #end
+                        #end
+                    </ul>
+                </div>
             </div>
-            <div class="tab-content">
+            <div  class="tab-content">
                 <div role="tabpanel" class="tab-pane active" id="detail">
                     <form class="form-horizontal" action="" id="survey-form">
                         <input type="hidden" name="user" value="$user.name" />
@@ -52,6 +66,21 @@
                                         #end
                                     </label>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-2" for="enable">Websites</label>
+                            <div class="col-md-4">
+                                #set ($wm = $page.find('/websites'))
+                                #foreach($w in $wm.websites)
+                                <div class="checkbox">
+                                    <label>
+                                        <input #if ($survey.jsonObject.websites.contains($w.name)) checked #end onclick="if(this.checked) document.getElementById('temp-websites').value = this.value" type="checkbox" name="websites" value="$w.name" />
+                                        <a href="http://${wm.websiteAddress($w)}${formatter.portString}" target="_blank">$w.name</a>
+                                    </label>
+                                </div>
+                                #end
+                                <input required="required" type="text" style="width:1px; height: 1px;opacity:0.01" id="temp-websites" name="temp-websites" value="$survey.jsonObject.websites">
                             </div>
                         </div>
                         <div class="form-group">
@@ -254,8 +283,8 @@
                                                 #set($progress = $formatter.toPercent($totalAnswerSubmits, $totalQuestionSubmits) )
                                                 #set($surveyCSV = "$surveyCSV$survey.name,$totalSubmits,$question.id,$question.fields.title.value,$answer.id,$answer.fields.body.value,$totalAnswerSubmits,$progress$linebreaker")
                                                 <div class="progress">
-                                                  <div class="progress-bar progress-bar-info progress-bar-striped active" role="progressbar" aria-valuenow="$progress.replace('%','')" aria-valuemin="0" aria-valuemax="100" style="text-align: left;">
-                                                        <div style="padding-left: 10px">$answer.fields.body.value ($progress - $totalAnswerSubmits selected)</div>
+                                                  <div class="progress-bar progress-bar-info active" role="progressbar" aria-valuenow="$progress.replace('%','')" aria-valuemin="0" aria-valuemax="100" style="text-align: left;">
+                                                        <div style="padding-left: 10px">$answer.fields.body.value ($progress - $totalAnswerSubmits votes)</div>
                                                   </div>
                                                 </div>
                                                 #end
@@ -354,6 +383,7 @@
                 #end
             </div>
         </div>
+        
 
         
     </body>

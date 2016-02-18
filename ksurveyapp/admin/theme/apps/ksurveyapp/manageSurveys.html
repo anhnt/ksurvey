@@ -108,6 +108,20 @@
                             </div>
                         </div>
                     </div>
+					<div class="form-group">
+						<label class="control-label col-md-4" for="enable">Websites</label>
+						<div class="col-md-8">
+							#set ($wm = $page.find('/websites'))
+							#foreach($w in $wm.websites)
+							<div class="checkbox">
+								<label>
+									<input onclick="if(this.checked) document.getElementById('temp-websites').value = this.value" type="checkbox" name="websites" value="$w.name" /> <a href="http://${wm.websiteAddress($w)}${formatter.portString}" target="_blank">$w.name</a>
+								</label>
+							</div>
+							#end
+							<input required="required" type="text" style="width:1px; height: 1px;opacity:0.01" id="temp-websites" name="temp-websites" value="">
+						</div>
+					</div>
                     <button type="submit" style="visibility: hidden; height: 1px"></button>
 				</form>
 	        </div>
@@ -116,7 +130,6 @@
 	            <button type="button" class="btn btn-primary btn-popup-save">Save</button>
 	        </div>
 	    </div>
-
 		<script src="/theme/apps/ksurveyapp/main.js"></script>
 	</body>
 </html>

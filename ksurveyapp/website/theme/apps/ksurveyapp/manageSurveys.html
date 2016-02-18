@@ -50,7 +50,7 @@
                                 <p class="text-right">
                                     
                                     #if($taken.hits.totalHits>0)
-                                    <a href="#" title="You've done this survey" class="btn btn-primary" disabled >Start</a>
+                                    <a href="/ksurvey/$survey.name/result" title="You've done this survey" class="btn btn-info" >View Result</a>
                                     #else
                                         #if(!$survey.jsonObject.status)
                                             <a href="#" title="This survey is disabled at the moment" class="btn btn-danger" disabled>Start</a>

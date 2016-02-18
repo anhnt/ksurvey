@@ -20,7 +20,6 @@
         #@themeBody()
         #end
         <div class="container">
-
             #set($survey = $page.attributes.survey)
             #set($accessGroups = $survey.jsonObject.groups.split(','))
             #set($canAccessSurvey = false)
@@ -43,11 +42,11 @@
                     </div>
                 </div>
             </div>
-            #elseif($taken.hits.totalHits>0)
+            #elseif($taken.hits.totalHits<1)
             <div class="row">
                 <div class="col-sm-12">
                     <div class="alert alert-info">
-                        <h3><strong>Thank you!</strong> You've just done this survey. <a href="/ksurvey/$survey.name/result">Click here to view result</a>  or <a href="/ksurvey">go back to survey list</a>!</h3>
+                        <h3><strong>Oops!</strong> You need to complete this survey to view result. <a href="/ksurvey/$survey.name">Click here</a> to go back to survey!</h3>
                     </div>
                 </div>
             </div>
@@ -59,14 +58,7 @@
                     </div>
                 </div>
             </div>
-            #elseif($expired && $expired>0)
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="alert alert-danger">
-                        <h3><strong>Oops!</strong> This survey has expired. <a href="/ksurvey">Click here</a> to go back to survey list!</h3>
-                    </div>
-                </div>
-            </div>
+
             #elseif($openingSoon && $openingSoon<0)
             <div class="row">
                 <div class="col-sm-12">
@@ -85,83 +77,67 @@
                     <div><i class="fa fa-clock-o"></i> <span class="surveytime">$survey.jsonObject.startTime</span> - <span class="surveytime">$survey.jsonObject.endTime</span></div>
                     #end
                     <p>$survey.jsonObject.description</p>
-                    <hr>
+
+                    #set ($surveyStatistic = $controllers.call('getSurveyStatistic', $page, $survey.name))
+                    #set ($surveyResult = $surveyStatistic.get('surveyResult'))
+                    #set ($totalSubmits = $surveyStatistic.get('totalSubmits'))
                     #set($questions = $page.attributes.questionResult.hits.hits)
                     #set($answers = $page.attributes.answerResult.hits.hits)
+                    <p><strong>Total Submissions: $totalSubmits</strong></p>
+                    <hr>
                     #if($page.attributes.questionResult.hits.totalHits > 0)
-                        <form id="surveyform" data-survey="$survey.name" action="/ksurvey/$survey.name" method="post">
-                            <input type="hidden" name="temp-surveyId" value="$survey.name">
-                            <input type="hidden" name="temp-user" value="$user.name">
-                            <input type="hidden" name="temp-userAgentHeader" value="$request.userAgentHeader">
-                            <input type="hidden" name="temp-fromAddress" value="$request.fromAddress">
-                            <input type="hidden" name="temp-totalQuestions" value="$page.attributes.questionResult.hits.totalHits">
                         #foreach($question in $questions)
                             <div id="questions">
                                 
                                 <div class="question-item">
                                     <h4>$question.fields.title.value</h4>
                                     <div class="question-description">$question.fields.body.value</div>
+                                    #if($question.fields.type.value!='1')
                                     <div class="answers">
-                                        #if($question.fields.type.value==1)
-                                            <!-- Plain text -->
-                                            <div class="form-group">
-                                                <textarea required="required" name="$question.id" class="form-control" placeholder="Please enter your answer here" id="exampleInputFile" ></textarea>
-                                              </div>
-                                        #end
-                                        
-                                        #if($question.fields.type.value==3)
-                                        <!-- Selectbox question -->
-                                        <div class="form-group">
-                                            <select required="required" class="form-control" name="$question.id">
-                                                <option value="">Please select your answer</option>
-                                        #end
-
-                                        
-
                                         #if($page.attributes.answerResult.hits.totalHits > 0)
+                                            #set($totalQuestionSubmits = $surveyResult.get($question.id).get('docCount'))
                                             #foreach($answer in $answers)
                                                 #if($answer.fields.questionId.value == $question.id)
-                                                    #if($question.fields.type.value==0)
-                                                    <!-- Multichoices -->
-                                                    <div class="checkbox">
-                                                        <label>
-                                                          <input name="$question.id" value="$answer.id" type="checkbox"> $answer.fields.body.value
-                                                        </label>
-                                                    </div>
-                                                    #elseif($question.fields.type.value==2)
-                                                    <!-- Yes/No question -->
-                                                    <div class="radio">
-                                                        <label>
-                                                          <input required="required" name="$question.id" value="$answer.id" type="radio"> $answer.fields.body.value
-                                                        </label>
-                                                    </div>
-                                                    #elseif($question.fields.type.value==3)
-                                                    <!-- Selectbox question -->
-                                                    <option value="$answer.id">$answer.fields.body.value</option>
+                                                    #set($totalAnswerSubmits = 0)
+                                                    #if($surveyResult.get($question.id).get('answers').get($answer.id))
+                                                    #set($totalAnswerSubmits = $surveyResult.get($question.id).get('answers').get($answer.id))
                                                     #end
+                                                    #set($progress = $formatter.toPercent($totalAnswerSubmits, $totalQuestionSubmits) )
+                                                    #set($surveyCSV = "$surveyCSV$survey.name,$totalSubmits,$question.id,$question.fields.title.value,$answer.id,$answer.fields.body.value,$totalAnswerSubmits,$progress$linebreaker")
+                                                    <div class="row">
+                                                        <div class="col-sm-6">
+                                                            <span class="glyphicon glyphicon-info-sign"></span> $answer.fields.body.value
+                                                        </div>
+                                                        <div class="col-sm-6">
+                                                            <div class="progress">
+                                                                <div class="progress-bar progress-bar-info active" role="progressbar" aria-valuenow="$progress.replace('%','')" aria-valuemin="0" aria-valuemax="100">
+                                                                    <div>$progress - $totalAnswerSubmits votes</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
                                                 #end
                                             #end
                                         #end
-                                        #if($question.fields.type.value==0)
-                                        <!-- Multichoices -->
-                                        <input required="required" type="text" style="width:1px; height: 1px;opacity:0.01" name="temp-$question.id" value="">
-                                        #end
-
-                                        #if($question.fields.type.value==3)
-                                        <!-- Selectbox question -->
-                                                </select>
-                                            </div>
-                                        #end
                                     </div>
+                                    #else
+                                    #set($totalAnswerSubmits = $surveyResult.get($question.id).get('answers').get('PLAIN_TEXT_ANSWER'))
+                                    <p><strong>Total answers: $totalAnswerSubmits </strong> <a data-questionId="$question.id" data-surveyId="$survey.name" href="#" class="btn btn-default btn-xs btn-view-plain-answer hide">View all <i class="fa fa-arrow-down"></i></a></p>
+                                    <ul class="plain-answers">
+                                        #set ($plainAnswers = $controllers.call('getPlainAnswers', $page, $question.id, $survey.name))
+                                        #if($plainAnswers.hits.totalHits > 0)
+                                        #foreach($plainAnswer in $plainAnswers.hits.hits)
+                                        <li>$plainAnswer.fields.answerBody.value - <a href="#">$plainAnswer.fields.userId.value</a></li>
+                                        #end
+                                        #end
+                                    </ul>
+                                    #end
                                 </div>
-                                
-                                
-
-                                
+                                <hr>
                             </div>
                         #end
-                        <div class="text-right"><button type="submit" class="btn btn-primary">Submit</button></div>
-                        </form>
                     #else
                     <p>No question found</p>
                     #end
@@ -180,7 +156,20 @@
                     }
                     var startTime = $('#cowndowntime').attr('data-startTime');
                     $('#cowndowntime').text(countdown(new Date(startTime)).toString());
-                },1000)
+                },1000);
+
+                function initProgressBar(){
+                    $('.progress-bar').each(function(){
+                        $(this).css('width',this.getAttribute('aria-valuenow')+'%');
+                        if(this.getAttribute('aria-valuenow')<1){
+                            $(this).css('color','#333');
+                            var div = $(this).children();
+                            div.detach().insertBefore($(this));
+                        }
+                    });
+                }
+
+                initProgressBar();
             })
         </script>
     </body>

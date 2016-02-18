@@ -82,6 +82,7 @@ function saveSurvey (page, params) {
     var status = safeBoolean(params.status);
     var startTime = params.startTime;
     var endTime = params.endTime;
+    var websites = params.websites;
     var db = getDB(page);
     var errors = [];
     var returnObj;
@@ -99,6 +100,7 @@ function saveSurvey (page, params) {
                 survey.modifiedDate = new Date();
                 survey.createdBy = user;
                 survey.modifiedBy = user;
+                survey.websites = websites;
                 if(startTime && endTime){
                     survey.startTime = startTime;
                     survey.endTime = endTime;
@@ -120,7 +122,8 @@ function saveSurvey (page, params) {
                 modifiedDate: new Date(),
                 createdDate: new Date(),
                 createdBy: user,
-                modifiedBy: user
+                modifiedBy: user,
+                websites: websites
             };
             if(startTime && endTime){
                 surveyJson.startTime = startTime;

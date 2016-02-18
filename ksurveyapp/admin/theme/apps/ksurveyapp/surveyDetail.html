@@ -259,7 +259,7 @@
                             </div>
                         </div>
                     </div>
-
+                    <div id="stats-questions">
                     #if($page.attributes.questionResult.hits.totalHits > 0 && $surveyResult.entrySet().size()>0 )
                          #foreach($question in $questions)
                             <div class="panel panel-default" data-questionId="$question.id">
@@ -307,13 +307,15 @@
                             </div>
                          #end
                     #end
-
+                    </div>
                     <script>
                         var surveyCSV = "data:text/csv;charset=utf-8,$surveyCSV";
                         var encodedUri = encodeURI(surveyCSV);
                         var link = document.getElementById("csvDownload");
-                        link.setAttribute("href", encodedUri);
-                        link.setAttribute("download", "my_data.csv");
+                        if(link){
+                            link.setAttribute("href", encodedUri);
+                            link.setAttribute("download", "my_data.csv");
+                        }
                     </script>
 
                 </div>

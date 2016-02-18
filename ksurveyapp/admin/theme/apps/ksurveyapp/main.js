@@ -178,7 +178,11 @@ $(function(){
                         list.find('li:last-child').attr('data-answer',resp.data.data.answerId);
                         form.find('[name=answerBody]').removeAttr('readonly');    
                     }
-                    
+                    $('#stats-questions').reloadFragment({
+                        whenComplete: function () {
+                            initProgressBar();
+                        }
+                    });
                 }else{
                     alert(resp.messages.join('\n'));
                     if(answerId.length){
@@ -207,6 +211,11 @@ $(function(){
                 success: function(resp){
                     if(resp && resp.status){
                         list.find('li[data-answer='+answerId+']').remove();
+                        $('#stats-questions').reloadFragment({
+                            whenComplete: function () {
+                                initProgressBar()
+                            }
+                        });
                     }else{
                         alert(resp.messages.join('\n'));
                     }
@@ -239,8 +248,6 @@ $(function(){
 
         var form = $(this);
 
-        // var valid = this.checkValidity();
-        // if(!valid) return;
         var modalQuestion = $('#modal-question');
         var data = form.serialize();
         if(modalQuestion.find('[name=questionId]').val()){
@@ -264,7 +271,11 @@ $(function(){
                             form.trigger('reset');
                         }
                     });
-                    
+                    $('#stats-questions').reloadFragment({
+                        whenComplete: function () {
+                            initProgressBar()
+                        }
+                    });
                 }else{
                     Msg.error(resp.data.messages.join('<br />'));
                 }
@@ -297,9 +308,7 @@ $(function(){
                         });
                     }else{
                         $('#preview-area').reloadFragment({
-                            whenComplete: function(){
-                                initDateRange();
-                            }
+
                         });
                     }
                 }else{

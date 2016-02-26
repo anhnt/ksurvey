@@ -18,12 +18,12 @@
                 <div class="col-sm-12">
                     <h3>Surveys</h3>
                     <hr>
-
                     #set ($surveys = $page.attributes.surveys)
                     #if ($surveys.size() > 0)
                         #foreach ($survey in $surveys)
                             #set($status = $survey.jsonObject.status)
-                            #if($status)
+                            #set($websiteAllowed =  $survey.jsonObject.websites != "null" && $survey.jsonObject.websites.contains($website.websiteName))
+                            #if($status && $survey.jsonObject.websites && $websiteAllowed)
                             <div class="survey-item">
                                 #set ($taken = $controllers.call('getSurveyResultByUser', $page, $user.name, $survey.name))
                                 #if($survey.jsonObject.endTime && $survey.jsonObject.startTime)

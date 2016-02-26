@@ -37,7 +37,7 @@ $(function(){
         var questionId = $(this).parents('.panel').attr('data-questionId');
         openFuseModal(modalQuestion);
         $.ajax({
-            url: '/ksurvey/question',
+            url: '/ksurvey/question/',
             type: 'get',
             data: {questionId: questionId, getQuestion:'getQuestion'},
             dataType: 'json',   
@@ -69,7 +69,7 @@ $(function(){
         var c = confirm('Are you sure to delete this question?');
         if(c){
             $.ajax({
-                url: '/ksurvey/question',
+                url: '/ksurvey/question/',
                 type: 'get',
                 data: {questionId: questionId, deleteQuestion:'deleteQuestion'},
                 dataType: 'json',
@@ -131,7 +131,7 @@ $(function(){
         var c = confirm('Are you sure to delete this survey?');
         if(c){
             $.ajax({
-                url: '/ksurvey',
+                url: '/ksurvey/',
                 type: 'post',
                 data: {surveyId: surveyId, deleteSurvey:'deleteSurvey'},
                 dataType: 'json',
@@ -166,7 +166,7 @@ $(function(){
     		form.find('[name=answerBody]').attr('readonly','readonly').val('');    
 		}
         $.ajax({
-            url: '/ksurvey/answer',
+            url: '/ksurvey/answer/',
             type: 'post',
             data: data,
             dataType: 'json',
@@ -204,7 +204,7 @@ $(function(){
 	    var c = confirm('Are you sure to delete this answer?');
 	    if(c){
 	        $.ajax({
-                url: '/ksurvey/answer',
+                url: '/ksurvey/answer/',
                 type: 'get',
                 data: {answerId: answerId, deleteAnswer: 'deleteAnswer'},
                 dataType: 'json',
@@ -256,7 +256,7 @@ $(function(){
         var questionId = form.find('[name=questionId]').val();
         
         $.ajax({
-            url: '/ksurvey/question',
+            url: '/ksurvey/question/',
             type: 'post',
             data: data,
             dataType: 'json',
@@ -330,7 +330,7 @@ $(function(){
             var name = input.attr('name');
             var surveyId = input.parents('.modal-body').attr('data-surveyId');
             $.ajax({
-                url: '/ksurvey/saveGroupAccess',
+                url: '/ksurvey/saveGroupAccess/',
                 data: {
                     group: name,
                     isAdd: isChecked,

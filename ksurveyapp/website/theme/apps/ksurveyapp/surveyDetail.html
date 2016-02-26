@@ -89,7 +89,7 @@
                     #set($questions = $page.attributes.questionResult.hits.hits)
                     #set($answers = $page.attributes.answerResult.hits.hits)
                     #if($page.attributes.questionResult.hits.totalHits > 0)
-                        <form id="surveyform" data-survey="$survey.name" action="/ksurvey/$survey.name" method="post">
+                        <form id="surveyform" data-survey="$survey.name" action="/ksurvey/$survey.name/" method="post">
                             <input type="hidden" name="temp-surveyId" value="$survey.name">
                             <input type="hidden" name="temp-user" value="$user.name">
                             <input type="hidden" name="temp-userAgentHeader" value="$request.userAgentHeader">

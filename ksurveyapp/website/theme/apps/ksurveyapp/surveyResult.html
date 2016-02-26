@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
     #parse("/theme/masterTemplate.html")
     <head>
-        #@themeHeader( "Survey Detail" )
+        #@themeHeader( "Survey Result" )
         <script src="/static/reload-fragment/1.0.1/jquery.reload-fragment-1.0.1.js" >//</script>
         <script type="text/javascript" src="/static/uri/1.15.1/URI.js">//</script>
         <script src="/static/moment/2.4.0/moment-2.4.0.js">//</script>
@@ -145,6 +145,41 @@
             </div>
             #end
         </div>
+        <div class="container">
+            <div class='row'>
+                <div style="margin: auto" class='col-lg-12 blog-comments'> <!-- start comments -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4>Questions and answers</h4>
+                        </div>
+                        <div class="panel-body">
+                            <div class="commentArea edifyViewMode">
+                                <div id="comments">
+                                    <div class="comments-stream">
+                                        <img src="/static/common/ajax-loader.gif" />
+                                    </div>
+
+                                    <div class="clr"></div>
+
+                                    <form action="#" method="post" id="postComment">
+                                        <div class="commentContainer">
+
+                                            <textarea id="postQuestion" class="form-control col-md-12" rows="1" placeholder="Ask a question, or offer an answer"></textarea>
+                                            <div class="commentControls">
+                                                <button class="btn #if(!$page.allowAnonComments)requiresUser#end btn-primary" type="submit">Post</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <br/><br/>
+                            </div>
+
+                        </div>
+                    </div>
+                </div> <!-- end comments -->
+            </div>
+        </div>
         <script type="text/javascript" src="/static/jquery.forms/1.1.0/jquery.forms-1.1.0.js">//</script>
         <script type="text/javascript" src="/theme/apps/ksurveyapp/ksurvey.js">//</script>
         <script type="text/javascript">
@@ -170,7 +205,9 @@
                 }
 
                 initProgressBar();
-            })
+                initComments(window.location.pathname);
+            });
+
         </script>
     </body>
 </html>

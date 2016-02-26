@@ -27,11 +27,16 @@
                     </button>
                     <ul class="dropdown-menu">
                         #set ($wm = $page.find('/websites'))
+                        #set($hasWebsite = false)
                         #foreach($w in $wm.websites)
                             #if ($survey.jsonObject.websites.contains($w.name))
+                            #set($hasWebsite = true)
                             #set ($url = "http://${wm.websiteAddress($w)}${formatter.portString}/ksurvey/$survey.name")
-                            <li><a target="_blank" href="$url">$w.name</a></li>
+                            <li><a target="_blank" href="$url"><i class="fa fa-link"></i> $w.name</a></li>
                             #end
+                        #end
+                        #if(!$hasWebsite)
+                        <li style="padding: 3px 6px">No website</li>
                         #end
                     </ul>
                 </div>

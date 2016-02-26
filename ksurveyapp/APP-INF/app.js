@@ -7,7 +7,7 @@ controllerMappings
 
 controllerMappings
     .adminController()
-    .path('/ksurvey')
+    .path('/ksurvey/')
     .enabled(true)
     .defaultView(views.templateView('ksurveyapp/manageSurveys.html'))
     .addMethod('GET', 'getSurveys')
@@ -18,7 +18,14 @@ controllerMappings
 
 controllerMappings
     .adminController()
-    .path('/ksurvey/(?<surveyId>[^/]*)')
+    .path('/ksurvey')
+    .enabled(true)
+    .addMethod("GET", "checkRedirect")
+    .build();
+
+controllerMappings
+    .adminController()
+    .path('/ksurvey/(?<surveyId>[^/]*)/')
     .enabled(true)
     .addPathResolver('surveyId', 'findSurvey')
     .defaultView(views.templateView('ksurveyapp/surveyDetail.html'))
@@ -29,14 +36,21 @@ controllerMappings
 
 controllerMappings
     .adminController()
-    .path('/ksurvey/saveGroupAccess')
+    .path('/ksurvey/(?<surveyId>[^/]*)')
+    .enabled(true)
+    .addMethod("GET", "checkRedirect")
+    .build();
+
+controllerMappings
+    .adminController()
+    .path('/ksurvey/saveGroupAccess/')
     .enabled(true)
     .addMethod('POST', 'saveGroupAccess')
     .build();
 
 controllerMappings
     .adminController()
-    .path('/ksurvey/answer')
+    .path('/ksurvey/answer/')
     .enabled(true)
     .addMethod('GET','deleteAnswer', 'deleteAnswer')
     .addMethod('GET','getPlainAnswers', 'getPlainAnswers')
@@ -45,18 +59,17 @@ controllerMappings
 
 controllerMappings
     .adminController()
-    .path('/ksurvey/question')
+    .path('/ksurvey/question/')
     .enabled(true)
     .addMethod('GET','getQuestion','getQuestion')
     .addMethod('GET','deleteQuestion','deleteQuestion')
     .addMethod('POST','saveQuestion')
     .build();
 
-
 // website controllers
 controllerMappings
     .websiteController()
-    .path('/ksurvey')
+    .path('/ksurvey/')
     .enabled(true)
     .defaultView(views.templateView('ksurveyapp/manageSurveys.html'))
     .addMethod('GET', 'getSurveys')
@@ -64,9 +77,15 @@ controllerMappings
 
 controllerMappings
     .websiteController()
-    .path('/ksurvey/(?<surveyId>[^/]*)')
+    .path('/ksurvey')
     .enabled(true)
-    .isPublic(true)
+    .addMethod("GET", "checkRedirect")
+    .build();
+
+controllerMappings
+    .websiteController()
+    .path('/ksurvey/(?<surveyId>[^/]*)/')
+    .enabled(true)
     .postPriviledge("READ_CONTENT")
     .addPathResolver('surveyId', 'findSurvey')
     .defaultView(views.templateView('ksurveyapp/surveyDetail.html'))
@@ -77,13 +96,26 @@ controllerMappings
 
 controllerMappings
     .websiteController()
-    .path('/ksurvey/(?<surveyId>[^/]*)/result')
+    .path('/ksurvey/(?<surveyId>[^/]*)')
     .enabled(true)
-    .isPublic(true)
+    .addMethod("GET", "checkRedirect")
+    .build();
+
+controllerMappings
+    .websiteController()
+    .path('/ksurvey/(?<surveyId>[^/]*)/result/')
+    .enabled(true)
     .addPathResolver('surveyId', 'findSurvey')
     .defaultView(views.templateView('ksurveyapp/surveyResult.html'))
     .addMethod('GET', 'getSurvey')
     .title('generateWebsiteTitle')
+    .build();
+
+controllerMappings
+    .websiteController()
+    .path('/ksurvey/(?<surveyId>[^/]*)/result')
+    .enabled(true)
+    .addMethod("GET", "checkRedirect")
     .build();
 
 function initApp(orgRoot, webRoot, enabled){
@@ -102,4 +134,13 @@ function initApp(orgRoot, webRoot, enabled){
             saveMapping(db, name, mapping);
         }
     }
+}
+
+function checkRedirect(page, params) {
+    var href = page.href;
+    if (!href.endsWith('/')) {
+        href = href + '/';
+    }
+
+    return views.redirectView(href);
 }

@@ -6,6 +6,7 @@ var DB_MAPPINGS = {
     answer: answerMapping,
     result: resultMapping
 };
+var dbUser = 'anhnt';
 
 function getDB(page) {
     log.info('getDB > page={}', page);

@@ -129,10 +129,7 @@ function initApp(orgRoot, webRoot, enabled){
 
         db = dbs.createDb(DB_NAME, DB_TITLE, DB_NAME);
 
-        for (var name in DB_MAPPINGS) {
-            var mapping = DB_MAPPINGS[name];
-            saveMapping(db, name, mapping);
-        }
+        saveMapping(db);
     }
 }
 

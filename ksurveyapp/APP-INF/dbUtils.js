@@ -4,7 +4,8 @@ var DB_MAPPINGS = {
     survey: surveyMapping,
     question: questionMapping,
     answer: answerMapping,
-    result: resultMapping
+    result: resultMapping,
+    submit: surveySubmitsMapping
 };
 var dbUser = 'anhnt';
 
@@ -26,11 +27,13 @@ function getDB(page) {
     return db;
 }
 
-function saveMapping(db, name, mapping) {
-    log.info('saveMapping > db={}, typeName={}, mapping={}', db, name, mapping);
+function saveMapping(db) {
+    log.info('saveMapping > db={}, typeName={}, mapping={}', db);
 
     var mapBuilder = formatter.newMapBuilder();
-    mapBuilder.field(name, JSON.stringify(mapping));
+    for(var name in DB_MAPPINGS){
+        mapBuilder.field(name, JSON.stringify(DB_MAPPINGS[name]));
+    }
     db.updateTypeMappings(mapBuilder);
 }
 

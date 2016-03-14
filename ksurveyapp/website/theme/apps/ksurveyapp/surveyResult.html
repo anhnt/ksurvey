@@ -25,7 +25,7 @@
             #set($canAccessSurvey = false)
             #foreach($groupName in $accessGroups)
                 #if(!$canAccessSurvey)
-                #set($canAccessSurvey = $user.isInGroup($groupName, $page.organisation))              
+                #set($canAccessSurvey = $userResource.isInGroup($groupName, $page.organisation.orgId))
                 #end
             #end
 

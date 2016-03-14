@@ -352,14 +352,24 @@
 				            <input type="text" class="form-control required" name="questionTitle" required="required" value="" />
 				        </div>
 				    </div>
+
                     <div class="form-group">
                         <label class="control-label col-md-2" for="questionType">Question type</label>
                         <div class="col-md-10">
                             <select name="questionType" class="form-control required" id="">
-                                <option value="0">Multichoices</option>
-                                <option value="1">Plain text</option>
+                                <option value="0">Multiple Choices</option>
+                                <option value="1">Plain Text</option>
                                 <option value="2">Yes/No Question</option>
-                                <option value="3">Selectbox</option>
+                                <option value="3">Single Choice</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group answerLayout hide">
+                        <label class="control-label col-md-2" for="title">Answers layout</label>
+                        <div class="col-md-10">
+                            <select name="answerLayout" class="form-control required" id="">
+                                <option selected value="0">Vertical (Default)</option>
+                                <option value="1">Horizontal</option>
                             </select>
                         </div>
                     </div>

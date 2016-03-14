@@ -1,6 +1,6 @@
 $(function(){
     
-    var QUESTION_TYPES = ['Multichoices','Plain text', 'Yes/No question', 'Selectbox question'];
+    var QUESTION_TYPES = ['Multiple Choices','Plain Text', 'Yes/No question', 'Single Choice'];
     var modalQuestion = $('#modal-question');
     var modalSurvey = $('#modal-survey');
     
@@ -26,11 +26,19 @@ $(function(){
 	$(document).on('click','.btn-add-question', function(e){
 		e.preventDefault();
         var modalQuestion = $('#modal-question');
+        modalQuestion.find('[name=questionType]').trigger('change');
         modalQuestion.find('form').trigger('reset');
         modalQuestion.find('[name=questionType]').removeAttr('disabled');
         openFuseModal(modalQuestion);
 	});
     
+    $(document).on('change', '[name=questionType]', function(){
+        if(this.value ==='3'){
+            $('.answerLayout').removeClass('hide');
+        }else{
+            $('.answerLayout').addClass('hide');
+        }
+    });
 
     $(document).on('click','.btn-edit-question', function(e){
         e.preventDefault();
@@ -46,12 +54,20 @@ $(function(){
                     if(resp.data.status){
                         var question = resp.data.data;
                         var modalQuestion = $('#modal-question');
+
                         modalQuestion.find('[name=questionId]').val(question.questionId);
                         modalQuestion.find('[name=surveyId]').val(question.surveyId);
                         modalQuestion.find('[name=createdBy]').val(question.createdBy);
                         modalQuestion.find('[name=questionTitle]').val(question.title);
                         modalQuestion.find('[name=questionType]').val(question.type).attr('disabled','disabled');
                         modalQuestion.find('[name=questionBody]').val(question.body);
+                        modalQuestion.find('[name=answerLayout]').val(question.answerLayout);
+                        if(question.type=="3"){
+                            modalQuestion.find('.answerLayout').removeClass('hide');
+                        }else{
+                            modalQuestion.find('.answerLayout').addClass('hide');
+                        }
+
                     }else{
                         alert(resp.messages.join('\n'));
                     }

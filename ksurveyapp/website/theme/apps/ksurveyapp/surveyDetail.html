@@ -20,13 +20,12 @@
         #@themeBody()
         #end
         <div class="container">
-
             #set($survey = $page.attributes.survey)
             #set($accessGroups = $survey.jsonObject.groups.split(','))
             #set($canAccessSurvey = false)
             #foreach($groupName in $accessGroups)
                 #if(!$canAccessSurvey)
-                #set($canAccessSurvey = $user.isInGroup($groupName, $page.organisation))              
+                #set($canAccessSurvey = $userResource.isInGroup($groupName, $page.organisation.orgId))
                 #end
             #end
 
@@ -109,15 +108,6 @@
                                               </div>
                                         #end
                                         
-                                        #if($question.fields.type.value==3)
-                                        <!-- Selectbox question -->
-                                        <div class="form-group">
-                                            <select required="required" class="form-control" name="$question.id">
-                                                <option value="">Please select your answer</option>
-                                        #end
-
-                                        
-
                                         #if($page.attributes.answerResult.hits.totalHits > 0)
                                             #foreach($answer in $answers)
                                                 #if($answer.fields.questionId.value == $question.id)
@@ -136,8 +126,21 @@
                                                         </label>
                                                     </div>
                                                     #elseif($question.fields.type.value==3)
-                                                    <!-- Selectbox question -->
-                                                    <option value="$answer.id">$answer.fields.body.value</option>
+                                                    <!-- Single choice question -->
+
+                                                        #if($question.fields.answerLayout.value=="0")
+                                                        <div class="radio">
+                                                            <label>
+                                                                <input name="$question.id" value="$answer.id" type="radio"> $answer.fields.body.value
+                                                            </label>
+                                                        </div>
+                                                        #else
+                                                        <div class="radio-inline">
+                                                            <label>
+                                                                <input name="$question.id" value="$answer.id" type="radio"> $answer.fields.body.value
+                                                            </label>
+                                                        </div>
+                                                        #end
                                                     #end
                                                 #end
                                             #end
@@ -147,11 +150,7 @@
                                         <input required="required" type="text" style="width:1px; height: 1px;opacity:0.01" name="temp-$question.id" value="">
                                         #end
 
-                                        #if($question.fields.type.value==3)
-                                        <!-- Selectbox question -->
-                                                </select>
-                                            </div>
-                                        #end
+
                                     </div>
                                 </div>
                                 

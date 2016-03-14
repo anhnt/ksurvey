@@ -53,6 +53,9 @@ var questionMapping = {
         "body": {
             "type": "string"
         },
+        "answerLayout": {
+            "type": "string"
+        },
         "surveyId": {
             "type": "string",
             "index": "not_analyzed"

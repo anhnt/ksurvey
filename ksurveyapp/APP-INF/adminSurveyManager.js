@@ -260,6 +260,7 @@ function saveQuestion(page, params){
     var surveyId = params.surveyId;
     var questionTitle = params.questionTitle;
     var questionType = params.questionType;
+    var answerLayout = params.answerLayout || 0; // o means vertical
     var questionBody = params.questionBody || '';
     var user = params.createdBy;
     var db = getDB(page);
@@ -277,6 +278,7 @@ function saveQuestion(page, params){
                 question.title = questionTitle;
                 question.type = questionType;
                 question.body = questionBody;
+                question.answerLayout = answerLayout;
                 question.modifiedDate = new Date();
                 returnObj = question;
                 returnObj.questionId = questionId;
@@ -293,6 +295,7 @@ function saveQuestion(page, params){
                 title: questionTitle,
                 type: questionType,
                 body: questionBody,
+                answerLayout: answerLayout,
                 modifiedDate: new Date(),
                 createdDate: new Date(),
                 createdBy: user
@@ -376,7 +379,8 @@ function findQuestionBySurvey(page, surveyId){
             'surveyId',
             'questionId',
             'title',
-            'type'
+            'type',
+            'answerLayout'
         ],
         'size': 1000,
         'aggs': {
@@ -415,7 +419,7 @@ function findQuestionBySurvey(page, surveyId){
 
 // this function would be invoked in view
 function getQuestionType(type){
-    var QUESTION_TYPES = ['Multichoices','Plain text', 'Yes/No question', 'Selectbox question'];
+    var QUESTION_TYPES = ['Multiple Choices','Plain Text', 'Yes/No question', 'Single Choice'];
     return QUESTION_TYPES[type];
 }
 

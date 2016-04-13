@@ -31,7 +31,7 @@
                         #foreach($w in $wm.websites)
                             #if ($survey.jsonObject.websites.contains($w.name))
                             #set($hasWebsite = true)
-                            #set ($url = "http://${wm.websiteAddress($w)}${formatter.portString}/ksurvey/$survey.name")
+                            #set ($url = "http://${wm.websiteAddress($w)}${formatter.portString}/ksurvey/$survey.name?goto=")
                             <li><a target="_blank" href="$url"><i class="fa fa-link"></i> $w.name</a></li>
                             #end
                         #end

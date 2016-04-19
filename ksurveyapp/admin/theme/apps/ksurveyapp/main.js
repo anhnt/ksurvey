@@ -289,7 +289,8 @@ $(function(){
                     });
                     $('#stats-questions').reloadFragment({
                         whenComplete: function () {
-                            initProgressBar()
+                            initProgressBar();
+                            initHistogram();
                         }
                     });
                 }else{
@@ -494,9 +495,59 @@ $(function(){
         });
     }
 
+    function initClearResult(){
+        $(document).on('click', '.clearUserResult', function(e){
+            e.preventDefault();
+
+            var userId = prompt('You are about to delete user result. Please enter userId to continue:');
+            var surveyId = $(this).attr('data-surveyId');
+            if(userId){
+                clearResult(surveyId, userId);
+            } else {
+                alert('Please enter username');
+            }
+        });
+
+        $(document).on('click', '.clearAllResult', function(e){
+            e.preventDefault();
+
+            var yes = confirm('Are you sure you want to delete all result? This data will not be able to restore.');
+            if(yes){
+               var surveyId = $(this).attr('data-surveyId');
+               clearResult(surveyId);
+            }
+        });
+    }
+
+    function clearResult(surveyId, userId){
+        if(!userId){
+            userId = '';
+        }
+        $.ajax({
+            url: '/ksurvey/clearResult/',
+            type: 'post',
+            data: {userId: userId, surveyId: surveyId},
+            success: function(resp){
+                if(resp && resp.status){
+                    Msg.info('Result has been cleared');
+                    $('#statistic').reloadFragment({
+                        whenComplete: function () {
+                            initProgressBar();
+                            initHistogram();
+                        }
+                    });
+                }
+            },
+            error: function(err){
+                Msg.error('Could not clear result. Please contact administrator for detail');
+            }
+        });
+    }
+
     initGroupModal();
     initDateRange();
     initProgressBar();
     initTimeago();
     initHistogram();
+    initClearResult();
 });

@@ -7,7 +7,6 @@ var DB_MAPPINGS = {
     result: resultMapping,
     submit: surveySubmitsMapping
 };
-var dbUser = 'anhnt';
 
 function getDB(page) {
     log.info('getDB > page={}', page);

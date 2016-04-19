@@ -2,5 +2,6 @@
 /*.db
 *.iml
 run.bat
+run-local.bat
 .mil
 .spliffy

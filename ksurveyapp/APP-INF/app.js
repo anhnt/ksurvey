@@ -59,6 +59,13 @@ controllerMappings
 
 controllerMappings
     .adminController()
+    .path('/ksurvey/clearResult/')
+    .enabled(true)
+    .addMethod('POST','clearResult')
+    .build();
+
+controllerMappings
+    .adminController()
     .path('/ksurvey/question/')
     .enabled(true)
     .addMethod('GET','getQuestion','getQuestion')

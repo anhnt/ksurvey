@@ -9,7 +9,6 @@
         <script src="/theme/apps/ksurveyapp/main.js">//</script>
     </head>
     <body>
-
         #set($survey = $page.attributes.survey)
         <div class="tabbable" id="surveyManager">
             <div class="clearfix">
@@ -18,7 +17,6 @@
                     <li role="presentation"><a href="#questions" aria-controls="questions" role="tab" data-toggle="tab"><i class="fa fa-list"></i> Questions</a></li>
                     <li class="" role="presentation"><a href="#groups" aria-controls="groups" role="tab" data-toggle="tab"><i class="fa fa-users"></i> Group Access</a></li>
                     <li role="presentation"><a href="#statistic" aria-controls="statistic" role="tab" data-toggle="tab"><i class="fa fa-area-chart"></i> Statistic</a></li>
-                    
                     <li class="hide" role="presentation"><a href="#history" aria-controls="history" role="tab" data-toggle="tab"><i class="fa fa-clock-o"></i> History</a></li>
                 </ul>
                 <div id="preview-area" class="btn-group pull-right">
@@ -31,7 +29,7 @@
                         #foreach($w in $wm.websites)
                             #if ($survey.jsonObject.websites.contains($w.name))
                             #set($hasWebsite = true)
-                            #set ($url = "http://${wm.websiteAddress($w)}${formatter.portString}/ksurvey/$survey.name?goto=")
+                            #set ($url = "http://${wm.websiteAddress($w)}${formatter.portString}/ksurvey/$survey.name")
                             <li><a target="_blank" href="$url"><i class="fa fa-link"></i> $w.name</a></li>
                             #end
                         #end
@@ -162,7 +160,6 @@
                         <a href="#" class="btn btn-primary btn-sm pull-right btn-add-question" data-survey="$survey.name"><i class="fa fa-plus-square"></i> Add new question</a>
                     </div>
                 </div>
-                
 
                 <div role="tabpanel" class="tab-pane group-access" id="groups">
                     <p>
@@ -233,6 +230,16 @@
                             <div class="col-sm-3">
                                 <h3 style="padding-top: 60px">Total Submissions: $totalSubmits</h3>
                                 <a id="csvDownload" download="data.csv" class="btn btn-primary">Download CSV</a>
+                                <div class="dropdown" style="margin-top: 10px">
+                                    <button class="btn btn-danger" id="dLabel" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Clear Results
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dLabel">
+                                        <li><a data-surveyId="$survey.name" class="clearUserResult" href="#">Clear result for specific user</a></li>
+                                        <li><a data-surveyId="$survey.name" class="clearAllResult" href="#">Clear all result</a></li>
+                                    </ul>
+                                </div>
                             </div>
                             #else
                             <div class="col-sm-12"><p class="text-center">No submits found</p></div>

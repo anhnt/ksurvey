@@ -442,3 +442,262 @@ function generateTitle(page){
     return title;
 }
 
+function clearResult(page, params){
+    log.info('findSubmissions {}', page);
+
+    var db = getDB(page);
+    var userId = params.userId;
+    var surveyId = params.surveyId;
+
+    var queryJson = {
+        'fields': [
+            'userId',
+            'surveyId'
+        ],
+        'size': 10000,
+        'query': {
+            'bool': {
+                'must': [
+                    {'type': { 'value': RECORD_TYPES.SUBMIT } },
+                    { 'term': { 'surveyId': surveyId } }
+                ]
+            }
+        }
+    };
+
+    var queryJson2 = {
+        'fields': [
+            'userId',
+            'surveyId'
+        ],
+        'size': 10000,
+        'query': {
+            'bool': {
+                'must': [
+                    {'type': { 'value': RECORD_TYPES.RESULT } },
+                    { 'term': { 'surveyId': surveyId } }
+                ]
+            }
+        }
+    };
+    if (userId) {
+        queryJson.query.bool.must.push({'term': {'userId': userId}});
+    }
+
+
+    var searchResult = doDBSearch(page, queryJson);
+    if (searchResult.hits.totalHits > 0) {
+        var hits = searchResult.hits.hits;
+        for(var i = 0; i< hits.length; i++){
+            log.info('hit item {}, id {}', hits[i], hits[i].id);
+            var submitRes = db.child(hits[i].id);
+            if(submitRes) submitRes.delete();
+        }
+    }
+
+    var searchResult2 = doDBSearch(page, queryJson2);
+    if (searchResult2.hits.totalHits > 0) {
+        var hits = searchResult2.hits.hits;
+        for(var i = 0; i< hits.length; i++){
+            log.info('hit item {}, id {}', hits[i], hits[i].id);
+            var resultRes = db.child(hits[i].id);
+            if(resultRes) resultRes.delete();
+        }
+    }
+
+    return views.jsonObjectView(JSON.stringify({status: true}))
+}
+
+function getSurveyStatistic(page, surveyId){
+    log.info('getSurveyStatistic {}');
+    var queryJson = {
+        'fields': [
+            'surveyId',
+            'questionId',
+            'answerId',
+            'userId',
+            'fromAddress',
+            'answerBody',
+            'createdDate'
+        ],
+        'size': 0,
+        'query': {
+            'bool': {
+                'must': [
+                    { 'type': { 'value': RECORD_TYPES.RESULT } },
+                    { 'term': { 'surveyId': surveyId } },
+                ]
+            }
+        },
+        'aggs': {
+            'by_question': {
+                'terms': {
+                    'field': 'questionId'
+                },
+                'aggs': {
+                    'by_answer': {
+                        'terms': {
+                            'field': 'answerId'
+                        }
+                    }
+                }
+            }
+        }
+    };
+    var searchResult = doDBSearch(page, queryJson);
+    var surveyResult = {};
+
+    if (searchResult.hits.totalHits > 0) {
+        var buckets = [];
+        if (searchResult.aggregations && searchResult.aggregations.get('by_question') && searchResult.aggregations.get('by_question').buckets) {
+            buckets = searchResult.aggregations.get('by_question').buckets;
+        }
+        for (var i = 0; i < buckets.length; i++) {
+            var question = buckets[i];
+
+            surveyResult[question.key] = {
+                docCount: question.docCount,
+                answers: {}
+            };
+
+            var answerBuckets = [];
+            if(question.aggregations && question.aggregations.get('by_answer') && question.aggregations.get('by_answer').buckets){
+                answerBuckets = question.aggregations.get('by_answer').buckets;
+            }
+
+            for (var j = 0; j < answerBuckets.length; j++) {
+                var ans = answerBuckets[j];
+                log.info('answer key {}', ans.key);
+                surveyResult[question.key].answers[ans.key] = ans.docCount;
+            }
+        }
+
+        log.info('surveyResult {}', JSON.stringify(surveyResult));
+
+    }
+
+
+    var queryJson1 = {
+        'fields': [
+            'surveyId',
+            'userId',
+            'createdDate'
+        ],
+        'size': 10000,
+        'query': {
+            'bool': {
+                'must': [
+                    { 'type': { 'value': RECORD_TYPES.SUBMIT } },
+                    { 'term': { 'surveyId': surveyId } },
+                ]
+            }
+        },
+        'aggs': {
+            'by_browser': {
+                'terms': {
+                    'field': 'browserName'
+                }
+            },
+            'by_os': {
+                'terms': {
+                    'field': 'osName'
+                }
+            },
+            'by_device': {
+                'terms': {
+                    'field': 'deviceModel'
+                }
+            },
+            'by_createdDate': {
+                'date_histogram': {
+                    "field" : "createdDate",
+                    "interval" : "day"
+                }
+            }
+        }
+    };
+
+    var searchResult1 = doDBSearch(page, queryJson1);
+    var userAgentResult = {
+        browser: {},
+        os: {},
+        device: {}
+    };
+    var histogram = {};
+
+    if(searchResult1.hits.totalHits>0){
+        // Browsers
+        var browserBuckets = [];
+        if (searchResult1.aggregations && searchResult1.aggregations.get('by_browser') && searchResult1.aggregations.get('by_browser').buckets) {
+            browserBuckets = searchResult1.aggregations.get('by_browser').buckets;
+        }
+        for (var i = 0; i < browserBuckets.length; i++) {
+            var browserBucket = browserBuckets[i];
+            userAgentResult.browser[browserBucket.key]=browserBucket.docCount;
+        }
+
+        // OS
+        var osBuckets = [];
+        if (searchResult1.aggregations && searchResult1.aggregations.get('by_os') && searchResult1.aggregations.get('by_os').buckets) {
+            osBuckets = searchResult1.aggregations.get('by_os').buckets;
+        }
+        for (var i = 0; i < osBuckets.length; i++) {
+            var osBucket = osBuckets[i];
+            userAgentResult.os[osBucket.key]=osBucket.docCount;
+        }
+
+        // Devices
+        var deviceBuckets = [];
+        if (searchResult1.aggregations && searchResult1.aggregations.get('by_os') && searchResult1.aggregations.get('by_os').buckets) {
+            deviceBuckets = searchResult1.aggregations.get('by_os').buckets;
+        }
+        for (var i = 0; i < deviceBuckets.length; i++) {
+            var deviceBucket = deviceBuckets[i];
+            userAgentResult.device[deviceBucket.key]=deviceBucket.docCount;
+        }
+
+        // by_createdDate
+        var createdDateBuckets = [];
+        if (searchResult1.aggregations && searchResult1.aggregations.get('by_createdDate') && searchResult1.aggregations.get('by_createdDate').buckets) {
+            createdDateBuckets = searchResult1.aggregations.get('by_createdDate').buckets;
+        }
+        for (var i = 0; i < createdDateBuckets.length; i++) {
+            var createdDateBucket = createdDateBuckets[i];
+            histogram[createdDateBucket.keyAsString]=createdDateBucket.docCount;
+        }
+    }
+    return {
+        surveyResult: surveyResult,
+        userAgentResult: userAgentResult,
+        totalSubmits: searchResult1.hits.totalHits,
+        histogram: histogram
+    };
+}
+
+function getPlainAnswers(page, questionId, surveyId){
+    log.info('getPlainAnswers {} questionId {} surveyId {}', page, questionId, surveyId);
+    var queryJson = {
+        'fields': [
+            'surveyId',
+            'questionId',
+            'answerId',
+            'userId',
+            'fromAddress',
+            'userAgentHeader',
+            'answerBody',
+            'createdDate'
+        ],
+        'size': 10000,
+        'query': {
+            'bool': {
+                'must': [
+                    { 'type': { 'value': RECORD_TYPES.RESULT } },
+                    { 'term': { 'surveyId': surveyId } },
+                    { 'term': { 'questionId': questionId } },
+                ]
+            }
+        }
+    };
+    var searchResult = doDBSearch(page, queryJson);
+    return searchResult;
+}

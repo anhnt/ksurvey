@@ -26,13 +26,17 @@
                     <ul class="dropdown-menu">
                         #set ($wm = $page.find('/websites'))
                         #set($hasWebsite = false)
+                        #set ($curProfile = $userResource.thisProfile)
                         #foreach($w in $wm.websites)
-                            #if ($survey.jsonObject.websites.contains($w.name))
-                            #set($hasWebsite = true)
-                            #set ($url = "http://${wm.websiteAddress($w)}${formatter.portString}/ksurvey/$survey.name")
-                            <li><a target="_blank" href="$url"><i class="fa fa-link"></i> $w.name</a></li>
-                            #end
+                        #if ($survey.jsonObject.websites.contains($w.name))
+                        #set($hasWebsite = true)
+                        #set ($wp = '/websites/'+ $w.name)
+                        #set ($loginToken = $page.find($wp).current.getLoginToken($curProfile))
+                        #set ($url = "http://${formatter.getDomainName($w)}/ksurvey/${survey.name}/?$loginToken")
+                        <li><a target="_blank" href="$url"><i class="fa fa-link"></i> $w.name</a></li>
                         #end
+                        #end
+
                         #if(!$hasWebsite)
                         <li style="padding: 3px 6px">No website</li>
                         #end

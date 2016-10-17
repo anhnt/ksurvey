@@ -1,9 +1,9 @@
 // admin controllers
 
-controllerMappings
-    .dependencies()
-    .add('KongoDB')
-    .build();
+//controllerMappings
+//    .dependencies()
+//    .add('KongoDB')
+//    .build();
 
 controllerMappings
     .adminController()

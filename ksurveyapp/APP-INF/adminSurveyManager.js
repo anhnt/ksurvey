@@ -532,12 +532,14 @@ function getSurveyStatistic(page, surveyId){
         'aggs': {
             'by_question': {
                 'terms': {
-                    'field': 'questionId'
+                    'field': 'questionId',
+                    'size': 10000
                 },
                 'aggs': {
                     'by_answer': {
                         'terms': {
-                            'field': 'answerId'
+                            'field': 'answerId',
+                            'size': 10000
                         }
                     }
                 }
@@ -595,23 +597,27 @@ function getSurveyStatistic(page, surveyId){
         'aggs': {
             'by_browser': {
                 'terms': {
-                    'field': 'browserName'
+                    'field': 'browserName',
+                    'size': 10000
                 }
             },
             'by_os': {
                 'terms': {
-                    'field': 'osName'
+                    'field': 'osName',
+                    'size': 10000
                 }
             },
             'by_device': {
                 'terms': {
-                    'field': 'deviceModel'
+                    'field': 'deviceModel',
+                    'size': 10000
                 }
             },
             'by_createdDate': {
                 'date_histogram': {
                     "field" : "createdDate",
-                    "interval" : "day"
+                    "interval" : "day",
+                    'size': 10000
                 }
             }
         }

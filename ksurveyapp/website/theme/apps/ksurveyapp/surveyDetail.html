@@ -1,186 +1,26 @@
-<html xmlns="http://www.w3.org/1999/xhtml">
-    #parse("/theme/masterTemplate.html")
-    <head>
-        #@themeHeader( "Survey Detail" )
-        <script src="/static/reload-fragment/1.0.1/jquery.reload-fragment-1.0.1.js" >//</script>
-        <script type="text/javascript" src="/static/uri/1.15.1/URI.js">//</script>
-        <script src="/static/moment/2.4.0/moment-2.4.0.js">//</script>
-        <script src="/theme/apps/ksurveyapp/countdown.min.js">//</script>
-        <style type="text/css">
-            #ksurvey-wrap{
-                padding-bottom: 20px;
-            }
-            .question-item{
-                margin-bottom: 30px;
-            }
-        </style>
-        #end
-    </head>
-    <body class="">
-        #@themeBody()
-        #end
-        <div class="container">
-            #set($survey = $page.attributes.survey)
-            #set($accessGroups = $survey.jsonObject.groups.split(','))
-            #set($canAccessSurvey = false)
-            #foreach($groupName in $accessGroups)
-                #if(!$canAccessSurvey)
-                #set($canAccessSurvey = $userResource.isInGroup($groupName, $page.organisation.orgId))
-                #end
-            #end
+#parse("/theme/masterTemplate.html")
+#@render()
+<html>
+<head>
+    <title>Survey Detail</title>
+</head>
 
-            #set ($taken = $controllers.call('getSurveyResultByUser', $page, $user.name, $survey.name))
-            #if($survey.jsonObject.endTime && $survey.jsonObject.startTime)
-                #set($expired = $formatter.now.compareTo($formatter.toDate($survey.jsonObject.endTime)))
-                #set($openingSoon = $formatter.now.compareTo($formatter.toDate($survey.jsonObject.startTime)))
-            #end
-            #if(!$canAccessSurvey)
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="alert alert-danger">
-                        <h3><strong>Oops!</strong> You don't have permission to access this survey. <a href="/ksurvey">Click here</a> to go back to survey list!</h3>
+<body class="survey-detail">
+<section>
+    <div class="container-bg">
+        <div class="container-layout container">
+            <div class="container-content-wrapper">
+                <div class="row">
+                    <div class="col-sm-12" data-type="container-content">
+                        <section data-survey="" data-type="component-ksurveyForm">
+                            <div data-dynamic-href="_components/ksurveyForm"></div>
+                        </section>
                     </div>
                 </div>
             </div>
-            #elseif($taken.hits.totalHits>0)
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="alert alert-info">
-                        <h3><strong>Thank you!</strong> You've just done this survey. <a href="/ksurvey/$survey.name/result">Click here to view result</a>  or <a href="/ksurvey">go back to survey list</a>!</h3>
-                    </div>
-                </div>
-            </div>
-            #elseif (!$survey.jsonObject.status)
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="alert alert-danger">
-                        <h3><strong>Oops!</strong> This survey is currently disabled by administrator. <a href="/ksurvey">Click here</a> to go back to survey list!</h3>
-                    </div>
-                </div>
-            </div>
-            #elseif($expired && $expired>0)
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="alert alert-danger">
-                        <h3><strong>Oops!</strong> This survey has expired. <a href="/ksurvey">Click here</a> to go back to survey list!</h3>
-                    </div>
-                </div>
-            </div>
-            #elseif($openingSoon && $openingSoon<0)
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="alert alert-info">
-                        <h3><strong>Hello!</strong> This survey is opening in <span id="cowndowntime" data-startTime="$survey.jsonObject.startTime">...</span> </h3>
-                    </div>
-                </div>
-            </div>
-            #else
-            <div class="row">
-                <div class="col-sm-12" id="ksurvey-wrap">
-                    
-                    <h3>$survey.jsonObject.name</h3>
-
-                    #if($survey.jsonObject.startTime)
-                    <div><i class="fa fa-clock-o"></i> <span class="surveytime">$survey.jsonObject.startTime</span> - <span class="surveytime">$survey.jsonObject.endTime</span></div>
-                    #end
-                    <p>$survey.jsonObject.description</p>
-                    <hr>
-                    #set($questions = $page.attributes.questionResult.hits.hits)
-                    #set($answers = $page.attributes.answerResult.hits.hits)
-                    #if($page.attributes.questionResult.hits.totalHits > 0)
-                        <form id="surveyform" data-survey="$survey.name" action="/ksurvey/$survey.name/" method="post">
-                            <input type="hidden" name="temp-surveyId" value="$survey.name">
-                            <input type="hidden" name="temp-user" value="$user.name">
-                            <input type="hidden" name="temp-userAgentHeader" value="$request.userAgentHeader">
-                            <input type="hidden" name="temp-fromAddress" value="$request.fromAddress">
-                            <input type="hidden" name="temp-totalQuestions" value="$page.attributes.questionResult.hits.totalHits">
-                        #foreach($question in $questions)
-                            <div id="questions">
-                                
-                                <div class="question-item">
-                                    <h4>$question.fields.title.value</h4>
-                                    <div class="question-description">$question.fields.body.value</div>
-                                    <div class="answers">
-                                        #if($question.fields.type.value==1)
-                                            <!-- Plain text -->
-                                            <div class="form-group">
-                                                <textarea required="required" name="$question.id" class="form-control" placeholder="Please enter your answer here" id="exampleInputFile" ></textarea>
-                                              </div>
-                                        #end
-                                        
-                                        #if($page.attributes.answerResult.hits.totalHits > 0)
-                                            #foreach($answer in $answers)
-                                                #if($answer.fields.questionId.value == $question.id)
-                                                    #if($question.fields.type.value==0)
-                                                    <!-- Multichoices -->
-                                                    <div class="checkbox">
-                                                        <label>
-                                                          <input name="$question.id" value="$answer.id" type="checkbox"> $answer.fields.body.value
-                                                        </label>
-                                                    </div>
-                                                    #elseif($question.fields.type.value==2)
-                                                    <!-- Yes/No question -->
-                                                    <div class="radio">
-                                                        <label>
-                                                          <input required="required" name="$question.id" value="$answer.id" type="radio"> $answer.fields.body.value
-                                                        </label>
-                                                    </div>
-                                                    #elseif($question.fields.type.value==3)
-                                                    <!-- Single choice question -->
-
-                                                        #if($question.fields.answerLayout.value=="0")
-                                                        <div class="radio">
-                                                            <label>
-                                                                <input name="$question.id" value="$answer.id" type="radio"> $answer.fields.body.value
-                                                            </label>
-                                                        </div>
-                                                        #else
-                                                        <div class="radio-inline">
-                                                            <label>
-                                                                <input name="$question.id" value="$answer.id" type="radio"> $answer.fields.body.value
-                                                            </label>
-                                                        </div>
-                                                        #end
-                                                    #end
-                                                #end
-                                            #end
-                                        #end
-                                        #if($question.fields.type.value==0)
-                                        <!-- Multichoices -->
-                                        <input required="required" type="text" style="width:1px; height: 1px;opacity:0.01" name="temp-$question.id" value="">
-                                        #end
-
-
-                                    </div>
-                                </div>
-                                
-                                
-
-                                
-                            </div>
-                        #end
-                        <div class="text-right"><button type="submit" class="btn btn-primary">Submit</button></div>
-                        </form>
-                    #else
-                    <p>No question found</p>
-                    #end
-                </div>
-            </div>
-            #end
         </div>
-        <script type="text/javascript" src="/static/jquery.forms/1.1.0/jquery.forms-1.1.0.js">//</script>
-        <script type="text/javascript" src="/theme/apps/ksurveyapp/ksurvey.js">//</script>
-        <script type="text/javascript">
-            $(function(){
-                var countdownT = setInterval(function(){
-                    if(!$('#cowndowntime').length){
-                        clearInterval(countdownT);
-                        return;
-                    }
-                    var startTime = $('#cowndowntime').attr('data-startTime');
-                    $('#cowndowntime').text(countdown(new Date(startTime)).toString());
-                },1000)
-            })
-        </script>
-    </body>
+    </div>
+</section>
+</body>
 </html>
+#end

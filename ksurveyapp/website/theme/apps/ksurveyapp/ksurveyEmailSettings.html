@@ -1,0 +1,58 @@
+<form class="form-horizontal">
+    #set( $jsonDatabases = $rootFolder.find("/jsondb/") )
+    #set( $surveyDB = $jsonDatabases.child("surveyDB") )
+    <div class="form-group">
+        <label class="col-sm-12">Kademi Survey</label>
+        <div class="col-sm-12">
+            <select class="form-control select-survey">
+                <option value="" selected="selected">- Please select -</option>
+                #foreach($survey in $surveyDB.findByType("survey"))
+                <option value="$survey.name">$survey.jsonObject.name</option>
+                #end
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-12">Website</label>
+        <div class="col-sm-12">
+            <select class="form-control select-website">
+                <option value="" selected="selected">- Please select -</option>
+                #foreach( $website in $rootFolder.find("/websites").children )
+                <option value="$website.name">$website.name</option>
+                #end
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-12">Invitation</label>
+        <div class="col-sm-12">
+            <textarea name="invitation" id="" cols="30" rows="10" class="form-control invitation"></textarea>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-12">Button style</label>
+        <div class="col-sm-12">
+            <select class="form-control buttonStyle">
+                <option value="#337ab7">Primary</option>
+                <option value="#5cb85c">Success</option>
+                <option value="#5bc0de">Info</option>
+                <option value="#f0ad4e">Warning</option>
+                <option value="#d9534f">Danger</option>
+                <option value="">Link</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-12">Button alignment</label>
+        <div class="col-sm-12">
+            <select class="form-control align">
+                <option value="left">Left</option>
+                <option value="center">Center</option>
+                <option value="right">Right</option>
+            </select>
+        </div>
+    </div>
+</form>

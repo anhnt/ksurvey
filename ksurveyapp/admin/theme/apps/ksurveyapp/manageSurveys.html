@@ -38,9 +38,9 @@
 			                			#end
 			                		</td>
 			                		<td>$survey.jsonObject.name</td>
-			                		#set ($surveyStatistic = $controllers.call('getSurveyStatistic', $page, $survey.name))
+			                		#set ($surveyStatistic = $page.controllerMappings.call('getSurveyStatistic', $page, $survey.name))
 			                		#set ($totalSubmits = $surveyStatistic.get('totalSubmits'))
-			                		<td>$totalSubmits</td>
+			                		<td>$!totalSubmits</td>
 			                		#set ($createdBy = $users.find($!survey.jsonObject.createdBy))
 			                		<td>$createdBy.name</td>
 			                		<td><abbr class="timeago" title="$!survey.jsonObject.createdDate">$!survey.jsonObject.createdDate</abbr></td>
@@ -115,7 +115,7 @@
 							#foreach($w in $wm.websites)
 							<div class="checkbox">
 								<label>
-									<input onclick="if(this.checked) document.getElementById('temp-websites').value = this.value" type="checkbox" name="websites" value="$w.name" /> <a href="http://${wm.websiteAddress($w)}${formatter.portString}" target="_blank">$w.name</a>
+									<input onclick="if(this.checked) document.getElementById('temp-websites').value = this.value" type="checkbox" name="websites" value="$w.name" /> $w.name
 								</label>
 							</div>
 							#end

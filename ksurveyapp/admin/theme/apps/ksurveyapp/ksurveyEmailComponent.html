@@ -1,0 +1,24 @@
+#set( $kfeedbackDb = $applications.KongoDB.findDatabase("surveyDB") )
+#set( $survey = $kfeedbackDb.child($surveyname) )
+#set( $website = $rootFolder )
+
+#if( $survey )
+#if (!$invitation)
+#set($invitation = $survey.jsonObject.name)
+#end
+#if (!$style)
+#set ($style='')
+#end
+<table align="$align" border="0" cellpadding="0" cellspacing="0" class="button-wrapper" bgcolor="$style" style="border-radius: 3px; background-color: $style;">
+    <tbody>
+    <tr>
+        <td align="$align" valign="middle" class="button-inner" style="padding-top: 10px; padding-bottom: 10px; padding-left: 15px; padding-right: 15px;">
+            <a title="Take the survey" href="${website.externalUrl}ksurvey/${survey.name}/?@{login}" target="_blank" style="font-size: 16px; font-weight: bold; text-align: center; text-decoration: none;  color: #if($style == '') #000000 #else #ffffff #end;">$!invitation</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+#else
+<p>No survey selected, or it has been removed</p>
+#end
+

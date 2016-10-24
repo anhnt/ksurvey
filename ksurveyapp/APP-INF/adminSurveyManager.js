@@ -616,8 +616,7 @@ function getSurveyStatistic(page, surveyId){
             'by_createdDate': {
                 'date_histogram': {
                     "field" : "createdDate",
-                    "interval" : "day",
-                    'size': 10000
+                    "interval" : "day"
                 }
             }
         }

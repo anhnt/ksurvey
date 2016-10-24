@@ -108,6 +108,7 @@ function submitSurvey(page, params){
             createdDate: new Date()
         };
         db.createNew(newSurveySubmitId, JSON.stringify(submitObj), RECORD_TYPES.SUBMIT);
+        eventManager.goalAchieved("ksurveySubmittedGoal");
 		log.info('saveResult done {}', JSON.stringify(surveyResult));
     }
 

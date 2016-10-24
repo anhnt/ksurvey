@@ -1,0 +1,15 @@
+<form class="form-horizontal">
+    #set( $jsonDatabases = $rootFolder.find("/jsondb/") )
+    #set( $surveyDB = $jsonDatabases.child("surveyDB") )
+    <div class="form-group">
+        <label class="col-sm-12">Kademi Survey</label>
+        <div class="col-sm-12">
+            <select class="form-control select-survey">
+                <option value="" selected="selected">- Please select -</option>
+                #foreach($survey in $surveyDB.findByType("survey"))
+                <option value="$survey.name">$survey.jsonObject.name</option>
+                #end
+            </select>
+        </div>
+    </div>
+</form>

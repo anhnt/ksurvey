@@ -398,9 +398,9 @@ $(function(){
         inputPlaceholder.daterangepicker({
             format: 'DD/MM/YYYY',
             ranges: {
-                'In 7 Days': [moment(), moment().add('days', 6)],
-                'In 15 Days': [moment(), moment().add('days', 14)],
-                'In 30 Days': [moment(), moment().add('days', 29)]
+                'In 7 Days': [moment(), moment().add(6, 'days')],
+                'In 15 Days': [moment(), moment().add(14, 'days')],
+                'In 30 Days': [moment(), moment().add( 29, 'days')]
             }
         },
         function (start, end) {
@@ -416,7 +416,7 @@ $(function(){
             var value = inputPlaceholder.val().trim();
 
             if (value) {
-                daterangepicker.notify();
+                //daterangepicker.notify();
             } else {
                 inputStartTime.val('');
                 inputEndTime.val('');

@@ -401,6 +401,9 @@ $(function(){
                 'In 7 Days': [moment(), moment().add(6, 'days')],
                 'In 15 Days': [moment(), moment().add(14, 'days')],
                 'In 30 Days': [moment(), moment().add( 29, 'days')]
+            },
+            locale: {
+                format: 'DD/MM/YYYY'
             }
         },
         function (start, end) {
